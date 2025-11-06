@@ -1,25 +1,18 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 
 app = Flask(__name__)
-# Enable CORS for all routes - allow all origins in development
-# This ensures CORS headers are always present
-CORS(app, 
-     origins="*",  # Allow all origins in development
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
-     supports_credentials=False)
-
-# Explicitly add CORS headers to all responses as a fallback
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    return response
+# Enable CORS for all routes. Allow the local React dev server by default.
+CORS(
+    app,
+    origins=["http://localhost:3000"],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+    supports_credentials=False,
+)
 
 # Database configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
