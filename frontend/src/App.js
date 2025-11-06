@@ -10,6 +10,7 @@ function App() {
   const [summary, setSummary] = useState({ total_income: 0, total_expenses: 0, balance: 0 });
   const [editingEntry, setEditingEntry] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -18,6 +19,7 @@ function App() {
   const loadData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const [entriesData, summaryData] = await Promise.all([
         getEntries(),
         getSummary()
@@ -26,7 +28,12 @@ function App() {
       setSummary(summaryData);
     } catch (error) {
       console.error('Error loading data:', error);
-      alert('Error loading data. Make sure the backend server is running.');
+      const errorMessage = error.response 
+        ? `Error: ${error.response.status} - ${error.response.statusText}`
+        : error.code === 'ECONNREFUSED' || error.message.includes('Network Error')
+        ? 'Cannot connect to backend server. Make sure the Flask server is running on http://localhost:5000'
+        : 'Error loading data. Please check the console for details.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -92,6 +99,21 @@ function App() {
     <div className="app">
       <div className="container">
         <h1 className="app-title">💰 Budget Tracker</h1>
+        
+        {error && (
+          <div className="error-banner">
+            <strong>⚠️ Connection Error:</strong> {error}
+            <div className="error-help">
+              <p>To start the backend server:</p>
+              <ol>
+                <li>Open a terminal and navigate to the <code>backend</code> directory</li>
+                <li>Activate your virtual environment: <code>source venv/bin/activate</code></li>
+                <li>Run: <code>python app.py</code></li>
+              </ol>
+              <button onClick={loadData} className="btn-retry">Retry Connection</button>
+            </div>
+          </div>
+        )}
         
         <BudgetSummary summary={summary} />
         

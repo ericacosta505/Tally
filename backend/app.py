@@ -40,6 +40,10 @@ with app.app_context():
     db.create_all()
 
 # API Routes
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'ok', 'message': 'Backend is running'}), 200
+
 @app.route('/api/entries', methods=['GET'])
 def get_entries():
     entries = BudgetEntry.query.order_by(BudgetEntry.date.desc()).all()

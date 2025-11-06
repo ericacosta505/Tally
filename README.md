@@ -40,13 +40,13 @@ Budget/
 cd backend
 ```
 
-2. Create a virtual environment (recommended):
+2. Create and activate a virtual environment:
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
+3. Install dependencies (make sure your virtual environment is activated):
 ```bash
 pip install -r requirements.txt
 ```
