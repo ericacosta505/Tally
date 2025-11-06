@@ -40,6 +40,19 @@ with app.app_context():
     db.create_all()
 
 # API Routes
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({
+        'message': 'Budget Tracker API is running!',
+        'status': 'ok',
+        'endpoints': {
+            'health': '/api/health',
+            'entries': '/api/entries',
+            'summary': '/api/summary'
+        },
+        'note': 'This is a REST API. Use the React frontend at http://localhost:3000 to interact with the application.'
+    }), 200
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'ok', 'message': 'Backend is running'}), 200
