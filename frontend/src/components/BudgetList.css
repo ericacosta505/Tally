@@ -1,0 +1,146 @@
+.budget-list {
+  margin-top: 30px;
+}
+
+.budget-list h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 15px;
+}
+
+.entries-table {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 120px 1fr 120px 100px 120px 100px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  padding: 15px;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 120px 100px 120px 100px;
+  padding: 15px;
+  border-bottom: 1px solid #e0e0e0;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.table-row:hover {
+  background-color: #f8f9fa;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  padding: 5px;
+  font-size: 0.95rem;
+}
+
+.table-cell.amount {
+  font-weight: 600;
+  text-align: right;
+}
+
+.table-cell.amount.income {
+  color: #11998e;
+}
+
+.table-cell.amount.expense {
+  color: #eb3349;
+}
+
+.table-cell.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.type-badge.income {
+  background: #d4edda;
+  color: #155724;
+}
+
+.type-badge.expense {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.btn-edit,
+.btn-delete {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.btn-edit:hover {
+  background-color: #e3f2fd;
+}
+
+.btn-delete:hover {
+  background-color: #ffebee;
+}
+
+@media (max-width: 768px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .table-cell {
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .table-cell:before {
+    content: attr(data-label);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+  }
+  
+  .table-header {
+    display: none;
+  }
+  
+  .table-cell.amount {
+    text-align: left;
+  }
+  
+  .table-cell.actions {
+    justify-content: flex-start;
+  }
+}
+
