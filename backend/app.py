@@ -5,7 +5,11 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
-CORS(app)
+# Enable CORS for all routes, allowing requests from the frontend
+# In development, allow requests from localhost:3000
+CORS(app, 
+     resources={r"/api/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}},
+     supports_credentials=True)
 
 # Database configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
