@@ -1,5 +1,6 @@
 import React from 'react';
 import './BudgetSummary.css';
+import BudgetCharts from './BudgetCharts';
 
 const BudgetSummary = ({ summary }) => {
   const { 
@@ -108,6 +109,8 @@ const BudgetSummary = ({ summary }) => {
           )}
         </div>
       )}
+      
+      <BudgetCharts summary={summary} />
     </div>
   );
 };
