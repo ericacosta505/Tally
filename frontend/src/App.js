@@ -99,7 +99,9 @@ function App() {
   return (
     <div className="app">
       <div className="container">
-        <h1 className="app-title">💰 Budget Tracker</h1>
+        <div className="app-header">
+          <h1 className="app-title">💰 Budget Tracker</h1>
+        </div>
         
         {error && (
           <div className="error-banner">
@@ -116,21 +118,31 @@ function App() {
           </div>
         )}
         
-        <BudgetSummary summary={summary} />
+        <div className="dashboard-grid">
+          <div className="summary-full-width">
+            <BudgetSummary summary={summary} />
+          </div>
+          
+          <div className="form-container">
+            <BudgetForm
+              onSubmit={editingEntry ? (data) => handleUpdate(editingEntry.id, data) : handleCreate}
+              editingEntry={editingEntry}
+              onCancel={handleCancelEdit}
+            />
+          </div>
+          
+          <div className="dashboard-right">
+            <BudgetSettings onUpdate={loadData} />
+          </div>
+        </div>
         
-        <BudgetSettings onUpdate={loadData} />
-        
-        <BudgetForm
-          onSubmit={editingEntry ? (data) => handleUpdate(editingEntry.id, data) : handleCreate}
-          editingEntry={editingEntry}
-          onCancel={handleCancelEdit}
-        />
-        
-        <BudgetList
-          entries={entries}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <div className="dashboard-full-width">
+          <BudgetList
+            entries={entries}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </div>
       </div>
     </div>
   );

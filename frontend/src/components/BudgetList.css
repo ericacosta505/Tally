@@ -1,48 +1,56 @@
 .budget-list {
-  margin-top: 30px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px var(--shadow);
 }
 
 .budget-list h2 {
-  color: #333;
-  margin-bottom: 20px;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
   font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #666;
-  background: #f8f9fa;
-  border-radius: 15px;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
 }
 
 .entries-table {
-  background: white;
-  border-radius: 15px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .table-header {
   display: grid;
   grid-template-columns: 120px 1fr 120px 100px 120px 100px 100px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
   font-weight: 600;
-  padding: 15px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table-row {
   display: grid;
   grid-template-columns: 120px 1fr 120px 100px 120px 100px 100px;
-  padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
   align-items: center;
   transition: background-color 0.2s;
+  background: var(--bg-card);
 }
 
 .table-row:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg-tertiary);
 }
 
 .table-row:last-child {
@@ -50,8 +58,9 @@
 }
 
 .table-cell {
-  padding: 5px;
+  padding: 8px;
   font-size: 0.95rem;
+  color: var(--text-primary);
 }
 
 .table-cell.amount {
@@ -60,11 +69,11 @@
 }
 
 .table-cell.amount.income {
-  color: #11998e;
+  color: var(--accent-success);
 }
 
 .table-cell.amount.expense {
-  color: #eb3349;
+  color: var(--accent-danger);
 }
 
 .table-cell.actions {
@@ -83,13 +92,13 @@
 }
 
 .type-badge.income {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-success);
 }
 
 .type-badge.expense {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--accent-danger);
 }
 
 .expense-category-badge {
@@ -102,23 +111,23 @@
 }
 
 .expense-category-badge.need {
-  background: #ffe5e5;
-  color: #c0392b;
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--accent-danger);
 }
 
 .expense-category-badge.want {
-  background: #fff4e5;
-  color: #d68910;
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--accent-warning);
 }
 
 .expense-category-badge.saving {
-  background: #e5f5e5;
-  color: #27ae60;
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-success);
 }
 
 .expense-category-badge.empty {
-  background: #f0f0f0;
-  color: #999;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
 }
 
 .btn-edit,
@@ -127,17 +136,20 @@
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 5px;
-  transition: background-color 0.2s;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  opacity: 0.7;
 }
 
 .btn-edit:hover {
-  background-color: #e3f2fd;
+  background-color: rgba(99, 102, 241, 0.2);
+  opacity: 1;
 }
 
 .btn-delete:hover {
-  background-color: #ffebee;
+  background-color: rgba(239, 68, 68, 0.2);
+  opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -149,7 +161,7 @@
   
   .table-cell {
     padding: 8px 0;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border-color);
   }
   
   .table-cell:before {
@@ -157,7 +169,7 @@
     font-weight: 600;
     display: block;
     margin-bottom: 5px;
-    color: #666;
+    color: var(--text-secondary);
   }
   
   .table-header {

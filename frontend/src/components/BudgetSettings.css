@@ -1,19 +1,20 @@
 .budget-settings {
-  background: white;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border-radius: 16px;
   padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px var(--shadow);
 }
 
 .budget-settings h2 {
   margin: 0 0 8px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 24px;
+  font-weight: 600;
 }
 
 .settings-description {
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 20px;
   font-size: 14px;
 }
@@ -38,99 +39,108 @@
 
 .setting-group label {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   font-size: 14px;
 }
 
 .setting-group.needs label {
-  color: #e74c3c;
+  color: var(--accent-danger);
 }
 
 .setting-group.wants label {
-  color: #f39c12;
+  color: var(--accent-warning);
 }
 
 .setting-group.savings label {
-  color: #27ae60;
+  color: var(--accent-success);
 }
 
 .setting-input {
   padding: 10px;
-  border: 2px solid #ddd;
-  border-radius: 4px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
   font-size: 16px;
-  transition: border-color 0.2s;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all 0.2s;
 }
 
 .setting-input:focus {
   outline: none;
-  border-color: #4a90e2;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .settings-total {
   text-align: center;
   padding: 12px;
-  background: #f8f9fa;
-  border-radius: 4px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
 }
 
 .total-label {
   font-size: 18px;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .total-label.valid {
-  color: #27ae60;
+  color: var(--accent-success);
 }
 
 .total-label.invalid {
-  color: #e74c3c;
+  color: var(--accent-danger);
 }
 
 .settings-message {
   padding: 12px;
-  border-radius: 4px;
+  border-radius: 8px;
   text-align: center;
   font-weight: 500;
 }
 
 .settings-message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .settings-message.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent-danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .btn-save-settings {
   padding: 12px 24px;
-  background: #4a90e2;
+  background: var(--accent-primary);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .btn-save-settings:hover:not(:disabled) {
-  background: #357abd;
+  background: var(--accent-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
 .btn-save-settings:disabled {
-  background: #ccc;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .loading {
   text-align: center;
   padding: 20px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

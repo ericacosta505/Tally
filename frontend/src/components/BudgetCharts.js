@@ -153,12 +153,13 @@ const BudgetCharts = ({ summary }) => {
 
   const chartOptions = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'bottom',
         labels: {
           padding: 15,
+          color: 'white',
           font: {
             size: 12
           },
@@ -175,6 +176,8 @@ const BudgetCharts = ({ summary }) => {
                   fillStyle: data.datasets[0].backgroundColor[i],
                   strokeStyle: data.datasets[0].borderColor[i],
                   lineWidth: data.datasets[0].borderWidth,
+                  fontColor: '#ffffff',
+                  color: '#ffffff',
                   hidden: false,
                   index: i
                 };
@@ -201,12 +204,13 @@ const BudgetCharts = ({ summary }) => {
   // Options for category consumption charts
   const categoryChartOptions = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'bottom',
         labels: {
           padding: 10,
+          color: 'white',
           font: {
             size: 11
           },
@@ -223,6 +227,8 @@ const BudgetCharts = ({ summary }) => {
                   fillStyle: data.datasets[0].backgroundColor[i],
                   strokeStyle: data.datasets[0].borderColor[i],
                   lineWidth: data.datasets[0].borderWidth,
+                  fontColor: '#ffffff',
+                  color: '#ffffff',
                   hidden: false,
                   index: i
                 };
@@ -267,51 +273,49 @@ const BudgetCharts = ({ summary }) => {
         </div>
         
         {(needs_target > 0 || wants_target > 0 || savings_target > 0) && (
-          <>
-            <div className="category-charts-section">
-              <h4>Budget Category Consumption</h4>
-              <div className="category-charts-container">
-                {needs_target > 0 && (
-                  <div className="category-chart-wrapper">
-                    <h5>Needs</h5>
-                    <div className="category-chart-info">
-                      <span className="category-target">Target: ${needs_target.toFixed(2)}</span>
-                      <span className="category-spent">Spent: ${needs_expenses.toFixed(2)}</span>
-                    </div>
-                    <div className="chart-container">
-                      <Pie data={needsChartData} options={categoryChartOptions} />
-                    </div>
+          <div className="chart-wrapper category-charts-wrapper">
+            <h4>Budget Category Consumption</h4>
+            <div className="category-charts-container">
+              {needs_target > 0 && (
+                <div className="category-chart-wrapper">
+                  <h5>Needs</h5>
+                  <div className="category-chart-info">
+                    <span className="category-target">Target: ${needs_target.toFixed(2)}</span>
+                    <span className="category-spent">Spent: ${needs_expenses.toFixed(2)}</span>
                   </div>
-                )}
-                
-                {wants_target > 0 && (
-                  <div className="category-chart-wrapper">
-                    <h5>Wants</h5>
-                    <div className="category-chart-info">
-                      <span className="category-target">Target: ${wants_target.toFixed(2)}</span>
-                      <span className="category-spent">Spent: ${wants_expenses.toFixed(2)}</span>
-                    </div>
-                    <div className="chart-container">
-                      <Pie data={wantsChartData} options={categoryChartOptions} />
-                    </div>
+                  <div className="chart-container">
+                    <Pie data={needsChartData} options={categoryChartOptions} />
                   </div>
-                )}
-                
-                {savings_target > 0 && (
-                  <div className="category-chart-wrapper">
-                    <h5>Savings</h5>
-                    <div className="category-chart-info">
-                      <span className="category-target">Target: ${savings_target.toFixed(2)}</span>
-                      <span className="category-spent">Spent: ${savings_expenses.toFixed(2)}</span>
-                    </div>
-                    <div className="chart-container">
-                      <Pie data={savingsChartData} options={categoryChartOptions} />
-                    </div>
+                </div>
+              )}
+              
+              {wants_target > 0 && (
+                <div className="category-chart-wrapper">
+                  <h5>Wants</h5>
+                  <div className="category-chart-info">
+                    <span className="category-target">Target: ${wants_target.toFixed(2)}</span>
+                    <span className="category-spent">Spent: ${wants_expenses.toFixed(2)}</span>
                   </div>
-                )}
-              </div>
+                  <div className="chart-container">
+                    <Pie data={wantsChartData} options={categoryChartOptions} />
+                  </div>
+                </div>
+              )}
+              
+              {savings_target > 0 && (
+                <div className="category-chart-wrapper">
+                  <h5>Savings</h5>
+                  <div className="category-chart-info">
+                    <span className="category-target">Target: ${savings_target.toFixed(2)}</span>
+                    <span className="category-spent">Spent: ${savings_expenses.toFixed(2)}</span>
+                  </div>
+                  <div className="chart-container">
+                    <Pie data={savingsChartData} options={categoryChartOptions} />
+                  </div>
+                </div>
+              )}
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

@@ -1,51 +1,112 @@
 .budget-charts {
-  margin-top: 30px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
 }
 
 .budget-charts h3 {
   margin: 0 0 20px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .charts-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
+  gap: 24px;
+  align-items: stretch;
 }
 
 .chart-wrapper {
-  background: white;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px var(--shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
+  min-height: 100%;
 }
 
 .chart-wrapper h4 {
   margin: 0 0 15px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1rem;
+  font-weight: 600;
   text-align: center;
 }
 
 .chart-container {
-  width: 100%;
-  max-width: 400px;
+  width: 300px;
   height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.chart-container canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Chart.js legend text styling */
+.budget-charts .chartjs-legend li,
+.budget-charts .chartjs-legend span {
+  color: white !important;
+}
+
+.budget-charts canvas + div {
+  color: white !important;
+}
+
+.budget-charts [class*="legend"] {
+  color: white !important;
+}
+
+.budget-charts [class*="legend"] * {
+  color: white !important;
+}
+
+/* Target Chart.js legend container directly */
+.budget-charts > div > div > div > div,
+.budget-charts > div > div > div > div > ul,
+.budget-charts > div > div > div > div > ul > li,
+.budget-charts > div > div > div > div > ul > li > span {
+  color: white !important;
+}
+
+/* More specific targeting for Chart.js v3+ */
+.chart-wrapper > div > div,
+.category-chart-wrapper > div > div {
+  color: white !important;
+}
+
+.chart-wrapper > div > div > ul,
+.category-chart-wrapper > div > div > ul {
+  color: white !important;
+}
+
+.chart-wrapper > div > div > ul > li,
+.category-chart-wrapper > div > div > ul > li {
+  color: white !important;
+}
+
+.chart-wrapper > div > div > ul > li > span,
+.category-chart-wrapper > div > div > ul > li > span {
+  color: white !important;
 }
 
 .no-data-message {
   text-align: center;
-  color: #999;
+  color: var(--text-muted);
   font-style: italic;
   padding: 40px;
 }
@@ -53,20 +114,21 @@
 .chart-note {
   margin-top: 15px;
   font-size: 12px;
-  color: #666;
+  color: var(--text-secondary);
   text-align: center;
   font-style: italic;
 }
 
-.category-charts-section {
-  margin-top: 30px;
-  width: 100%;
+.category-charts-wrapper {
+  display: flex;
+  flex-direction: column;
 }
 
-.category-charts-section h4 {
+.category-charts-wrapper h4 {
   margin: 0 0 20px 0;
-  color: #333;
-  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
   text-align: center;
 }
 
@@ -74,21 +136,25 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  flex: 1;
+  width: 100%;
 }
 
 .category-chart-wrapper {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px var(--shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
 }
 
 .category-chart-wrapper h5 {
   margin: 0 0 10px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1rem;
   font-weight: 600;
   text-align: center;
@@ -106,18 +172,19 @@
 .category-target,
 .category-spent {
   font-size: 13px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .category-target {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .category-chart-wrapper .chart-container {
-  width: 100%;
-  max-width: 250px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  position: relative;
 }
 
 @media (max-width: 1024px) {
@@ -132,6 +199,7 @@
   }
   
   .chart-container {
+    width: 250px;
     height: 250px;
   }
   
@@ -140,7 +208,8 @@
   }
   
   .category-chart-wrapper .chart-container {
-    height: 250px;
+    width: 180px;
+    height: 180px;
   }
 }
 
