@@ -33,6 +33,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin-bottom: 24px;
+  align-items: stretch;
 }
 
 .summary-full-width {
@@ -43,14 +44,18 @@
   grid-column: 1 / -1;
 }
 
-.dashboard-right {
+.entries-container {
+  grid-column: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  height: 100%;
 }
 
-.dashboard-full-width {
-  grid-column: 1 / -1;
+.settings-container {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .loading {

@@ -131,17 +131,17 @@ function App() {
             />
           </div>
           
-          <div className="dashboard-right">
+          <div className="entries-container">
+            <BudgetList
+              entries={entries}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
+          
+          <div className="settings-container">
             <BudgetSettings onUpdate={loadData} />
           </div>
-        </div>
-        
-        <div className="dashboard-full-width">
-          <BudgetList
-            entries={entries}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
         </div>
       </div>
     </div>
