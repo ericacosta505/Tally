@@ -7,23 +7,50 @@ import BudgetSettings from './components/BudgetSettings';
 import { getEntries, createEntry, updateEntry, deleteEntry, getSummary } from './services/api';
 
 function App() {
+  // Initialize with current month
+  const getCurrentMonth = () => {
+    const now = new Date();
+    return { month: now.getMonth() + 1, year: now.getFullYear() };
+  };
+
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
   const [entries, setEntries] = useState([]);
   const [summary, setSummary] = useState({ total_income: 0, total_expenses: 0, balance: 0 });
   const [editingEntry, setEditingEntry] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Check if month has changed and update automatically
+  useEffect(() => {
+    const checkMonthChange = () => {
+      const current = getCurrentMonth();
+      setSelectedMonth(prev => {
+        // Only update if the actual current month is different from what we're viewing
+        if (current.month !== prev.month || current.year !== prev.year) {
+          return current;
+        }
+        return prev;
+      });
+    };
+
+    // Check on mount and set up interval to check periodically
+    checkMonthChange();
+    const interval = setInterval(checkMonthChange, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array - only run on mount
+
   useEffect(() => {
     loadData();
-  }, []);
+  }, [selectedMonth]);
 
   const loadData = async () => {
     try {
       setLoading(true);
       setError(null);
       const [entriesData, summaryData] = await Promise.all([
-        getEntries(),
-        getSummary()
+        getEntries(selectedMonth.month, selectedMonth.year),
+        getSummary(selectedMonth.month, selectedMonth.year)
       ]);
       setEntries(entriesData);
       setSummary(summaryData);
@@ -38,6 +65,32 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const navigateMonth = (direction) => {
+    setSelectedMonth(prev => {
+      let newMonth = prev.month + direction;
+      let newYear = prev.year;
+      
+      if (newMonth < 1) {
+        newMonth = 12;
+        newYear -= 1;
+      } else if (newMonth > 12) {
+        newMonth = 1;
+        newYear += 1;
+      }
+      
+      return { month: newMonth, year: newYear };
+    });
+  };
+
+  const goToCurrentMonth = () => {
+    setSelectedMonth(getCurrentMonth());
+  };
+
+  const formatMonthYear = (month, year) => {
+    const date = new Date(year, month - 1);
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   };
 
   const handleCreate = async (entryData) => {
@@ -96,11 +149,42 @@ function App() {
     );
   }
 
+  const currentMonth = getCurrentMonth();
+  const isCurrentMonth = selectedMonth.month === currentMonth.month && selectedMonth.year === currentMonth.year;
+
   return (
     <div className="app">
       <div className="container">
         <div className="app-header">
           <h1 className="app-title">💰 Budget Tracker</h1>
+          <div className="month-navigation">
+            <button 
+              className="month-nav-btn" 
+              onClick={() => navigateMonth(-1)}
+              title="Previous month"
+            >
+              ←
+            </button>
+            <div className="month-display">
+              <span className="month-text">{formatMonthYear(selectedMonth.month, selectedMonth.year)}</span>
+              {!isCurrentMonth && (
+                <button 
+                  className="current-month-btn" 
+                  onClick={goToCurrentMonth}
+                  title="Go to current month"
+                >
+                  Today
+                </button>
+              )}
+            </div>
+            <button 
+              className="month-nav-btn" 
+              onClick={() => navigateMonth(1)}
+              title="Next month"
+            >
+              →
+            </button>
+          </div>
         </div>
         
         {error && (

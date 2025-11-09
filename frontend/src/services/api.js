@@ -34,8 +34,13 @@ const api = axios.create({
   },
 });
 
-export const getEntries = async () => {
-  const response = await api.get('/entries');
+export const getEntries = async (month = null, year = null) => {
+  const params = {};
+  if (month !== null && year !== null) {
+    params.month = month;
+    params.year = year;
+  }
+  const response = await api.get('/entries', { params });
   return response.data;
 };
 
@@ -54,8 +59,13 @@ export const deleteEntry = async (id) => {
   return response.data;
 };
 
-export const getSummary = async () => {
-  const response = await api.get('/summary');
+export const getSummary = async (month = null, year = null) => {
+  const params = {};
+  if (month !== null && year !== null) {
+    params.month = month;
+    params.year = year;
+  }
+  const response = await api.get('/summary', { params });
   return response.data;
 };
 

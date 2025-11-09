@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from dateutil import parser
 import os
 
 app = Flask(__name__)
@@ -112,7 +113,34 @@ def health_check():
 
 @app.route('/api/entries', methods=['GET'])
 def get_entries():
-    entries = BudgetEntry.query.order_by(BudgetEntry.date.desc()).all()
+    month = request.args.get('month')
+    year = request.args.get('year')
+    
+    query = BudgetEntry.query
+    
+    # Filter by month and year if provided
+    if month and year:
+        try:
+            month_int = int(month)
+            year_int = int(year)
+            # Filter entries where date matches the month and year
+            # Date is stored as string, so we need to parse it
+            entries = query.order_by(BudgetEntry.date.desc()).all()
+            filtered_entries = []
+            for entry in entries:
+                try:
+                    entry_date = parser.parse(entry.date)
+                    if entry_date.month == month_int and entry_date.year == year_int:
+                        filtered_entries.append(entry)
+                except (ValueError, TypeError):
+                    # If date parsing fails, skip this entry
+                    continue
+            return jsonify([entry.to_dict() for entry in filtered_entries])
+        except ValueError:
+            # Invalid month/year, return all entries
+            pass
+    
+    entries = query.order_by(BudgetEntry.date.desc()).all()
     return jsonify([entry.to_dict() for entry in entries])
 
 @app.route('/api/entries', methods=['POST'])
@@ -155,7 +183,31 @@ def delete_entry(entry_id):
 
 @app.route('/api/summary', methods=['GET'])
 def get_summary():
-    entries = BudgetEntry.query.all()
+    month = request.args.get('month')
+    year = request.args.get('year')
+    
+    query = BudgetEntry.query
+    entries = query.all()
+    
+    # Filter by month and year if provided
+    if month and year:
+        try:
+            month_int = int(month)
+            year_int = int(year)
+            filtered_entries = []
+            for entry in entries:
+                try:
+                    entry_date = parser.parse(entry.date)
+                    if entry_date.month == month_int and entry_date.year == year_int:
+                        filtered_entries.append(entry)
+                except (ValueError, TypeError):
+                    # If date parsing fails, skip this entry
+                    continue
+            entries = filtered_entries
+        except ValueError:
+            # Invalid month/year, use all entries
+            pass
+    
     total_income = sum(entry.amount for entry in entries if entry.type == 'income')
     total_expenses = sum(entry.amount for entry in entries if entry.type == 'expense')
     balance = total_income - total_expenses

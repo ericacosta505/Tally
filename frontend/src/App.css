@@ -15,6 +15,11 @@
   margin-bottom: 32px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .app-title {
@@ -26,6 +31,77 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.month-navigation {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-secondary);
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.month-nav-btn {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.month-nav-btn:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.month-nav-btn:active {
+  transform: translateY(0);
+}
+
+.month-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.month-text {
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.current-month-btn {
+  background: var(--accent-secondary);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.current-month-btn:hover {
+  background: var(--accent-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 .dashboard-grid {
@@ -137,8 +213,27 @@
     padding: 16px;
   }
   
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
   .app-title {
     font-size: 2rem;
+  }
+  
+  .month-navigation {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .month-display {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .month-text {
+    font-size: 1rem;
   }
   
   .dashboard-grid {
