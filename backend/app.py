@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import parser
+from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
 import os
 
 app = Flask(__name__)
@@ -37,12 +39,42 @@ def add_cors_headers(response):
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "budget.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 db = SQLAlchemy(app)
+
+# User Model
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    phone_number = db.Column(db.String(20), nullable=False)
+    date_of_birth = db.Column(db.Date, nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'phone_number': self.phone_number,
+            'date_of_birth': self.date_of_birth.isoformat() if self.date_of_birth else None,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
 
 # Budget Settings Model
 class BudgetSettings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
     needs_percentage = db.Column(db.Float, default=50.0, nullable=False)
     wants_percentage = db.Column(db.Float, default=30.0, nullable=False)
     savings_percentage = db.Column(db.Float, default=20.0, nullable=False)
@@ -60,6 +92,7 @@ class BudgetSettings(db.Model):
 # Budget Entry Model
 class BudgetEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
     description = db.Column(db.String(200), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(100), nullable=False)
@@ -80,18 +113,49 @@ class BudgetEntry(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
-# Create tables and initialize default settings
+# Create tables
 with app.app_context():
     db.create_all()
-    # Initialize default budget settings if they don't exist
-    if BudgetSettings.query.first() is None:
-        default_settings = BudgetSettings(
-            needs_percentage=50.0,
-            wants_percentage=30.0,
-            savings_percentage=20.0
-        )
-        db.session.add(default_settings)
-        db.session.commit()
+
+# Authentication helper functions
+def generate_token(user_id):
+    payload = {
+        'user_id': user_id,
+        'exp': datetime.utcnow() + timedelta(days=7)
+    }
+    return jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+
+def verify_token(token):
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        return payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.InvalidTokenError:
+        return None
+
+def get_current_user():
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return None
+    
+    try:
+        token = auth_header.split(' ')[1]  # Format: "Bearer <token>"
+        user_id = verify_token(token)
+        if user_id:
+            return User.query.get(user_id)
+    except (IndexError, AttributeError):
+        pass
+    return None
+
+def require_auth(f):
+    def decorated_function(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({'error': 'Authentication required'}), 401
+        return f(user, *args, **kwargs)
+    decorated_function.__name__ = f.__name__
+    return decorated_function
 
 # API Routes
 @app.route('/', methods=['GET'])
@@ -111,12 +175,84 @@ def index():
 def health_check():
     return jsonify({'status': 'ok', 'message': 'Backend is running'}), 200
 
+# Authentication routes
+@app.route('/api/auth/signup', methods=['POST'])
+def signup():
+    data = request.json
+    
+    # Validate required fields
+    required_fields = ['email', 'phone_number', 'date_of_birth', 'first_name', 'last_name', 'password']
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({'error': f'{field} is required'}), 400
+    
+    # Check if user already exists
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({'error': 'Email already registered'}), 400
+    
+    # Create new user
+    try:
+        dob = parser.parse(data['date_of_birth']).date()
+        user = User(
+            email=data['email'],
+            phone_number=data['phone_number'],
+            date_of_birth=dob,
+            first_name=data['first_name'],
+            last_name=data['last_name']
+        )
+        user.set_password(data['password'])
+        db.session.add(user)
+        db.session.commit()
+        
+        # Create default budget settings for the user
+        default_settings = BudgetSettings(
+            user_id=user.id,
+            needs_percentage=50.0,
+            wants_percentage=30.0,
+            savings_percentage=20.0
+        )
+        db.session.add(default_settings)
+        db.session.commit()
+        
+        # Generate token
+        token = generate_token(user.id)
+        
+        return jsonify({
+            'message': 'User created successfully',
+            'token': token,
+            'user': user.to_dict()
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    data = request.json
+    
+    if not data.get('email') or not data.get('password'):
+        return jsonify({'error': 'Email and password are required'}), 400
+    
+    user = User.query.filter_by(email=data['email']).first()
+    
+    if not user or not user.check_password(data['password']):
+        return jsonify({'error': 'Invalid email or password'}), 401
+    
+    token = generate_token(user.id)
+    
+    return jsonify({
+        'message': 'Login successful',
+        'token': token,
+        'user': user.to_dict()
+    }), 200
+
 @app.route('/api/entries', methods=['GET'])
-def get_entries():
+@require_auth
+def get_entries(user):
     month = request.args.get('month')
     year = request.args.get('year')
     
-    query = BudgetEntry.query
+    query = BudgetEntry.query.filter_by(user_id=user.id)
     
     # Filter by month and year if provided
     if month and year:
@@ -144,9 +280,11 @@ def get_entries():
     return jsonify([entry.to_dict() for entry in entries])
 
 @app.route('/api/entries', methods=['POST'])
-def create_entry():
+@require_auth
+def create_entry(user):
     data = request.json
     entry = BudgetEntry(
+        user_id=user.id,
         description=data.get('description'),
         amount=data.get('amount'),
         category=data.get('category'),
@@ -159,8 +297,9 @@ def create_entry():
     return jsonify(entry.to_dict()), 201
 
 @app.route('/api/entries/<int:entry_id>', methods=['PUT'])
-def update_entry(entry_id):
-    entry = BudgetEntry.query.get_or_404(entry_id)
+@require_auth
+def update_entry(user, entry_id):
+    entry = BudgetEntry.query.filter_by(id=entry_id, user_id=user.id).first_or_404()
     data = request.json
     entry.description = data.get('description', entry.description)
     entry.amount = data.get('amount', entry.amount)
@@ -175,18 +314,20 @@ def update_entry(entry_id):
     return jsonify(entry.to_dict())
 
 @app.route('/api/entries/<int:entry_id>', methods=['DELETE'])
-def delete_entry(entry_id):
-    entry = BudgetEntry.query.get_or_404(entry_id)
+@require_auth
+def delete_entry(user, entry_id):
+    entry = BudgetEntry.query.filter_by(id=entry_id, user_id=user.id).first_or_404()
     db.session.delete(entry)
     db.session.commit()
     return jsonify({'message': 'Entry deleted successfully'}), 200
 
 @app.route('/api/summary', methods=['GET'])
-def get_summary():
+@require_auth
+def get_summary(user):
     month = request.args.get('month')
     year = request.args.get('year')
     
-    query = BudgetEntry.query
+    query = BudgetEntry.query.filter_by(user_id=user.id)
     entries = query.all()
     
     # Filter by month and year if provided
@@ -218,8 +359,8 @@ def get_summary():
     savings_expenses = sum(entry.amount for entry in entries if entry.type == 'expense' and entry.expense_category == 'saving')
     uncategorized_expenses = sum(entry.amount for entry in entries if entry.type == 'expense' and not entry.expense_category)
     
-    # Get budget settings
-    settings = BudgetSettings.query.first()
+    # Get budget settings for this user
+    settings = BudgetSettings.query.filter_by(user_id=user.id).first()
     if settings:
         needs_target = total_income * (settings.needs_percentage / 100)
         wants_target = total_income * (settings.wants_percentage / 100)
@@ -241,13 +382,15 @@ def get_summary():
     })
 
 @app.route('/api/settings', methods=['GET'])
-def get_settings():
-    settings = BudgetSettings.query.first()
+@require_auth
+def get_settings(user):
+    settings = BudgetSettings.query.filter_by(user_id=user.id).first()
     if settings:
         return jsonify(settings.to_dict())
     else:
         # Create default settings if none exist
         default_settings = BudgetSettings(
+            user_id=user.id,
             needs_percentage=50.0,
             wants_percentage=30.0,
             savings_percentage=20.0
@@ -257,12 +400,13 @@ def get_settings():
         return jsonify(default_settings.to_dict())
 
 @app.route('/api/settings', methods=['PUT'])
-def update_settings():
+@require_auth
+def update_settings(user):
     data = request.json
-    settings = BudgetSettings.query.first()
+    settings = BudgetSettings.query.filter_by(user_id=user.id).first()
     
     if not settings:
-        settings = BudgetSettings()
+        settings = BudgetSettings(user_id=user.id)
         db.session.add(settings)
     
     needs = data.get('needs_percentage', settings.needs_percentage)

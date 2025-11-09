@@ -34,6 +34,37 @@ const api = axios.create({
   },
 });
 
+// Add token to requests if available
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Handle 401 errors (unauthorized)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid, clear auth data
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Redirect to login if not already there
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const getEntries = async (month = null, year = null) => {
   const params = {};
   if (month !== null && year !== null) {
@@ -81,5 +112,16 @@ export const getSettings = async () => {
 
 export const updateSettings = async (settingsData) => {
   const response = await api.put('/settings', settingsData);
+  return response.data;
+};
+
+// Authentication functions
+export const signup = async (userData) => {
+  const response = await api.post('/auth/signup', userData);
+  return response.data;
+};
+
+export const login = async (email, password) => {
+  const response = await api.post('/auth/login', { email, password });
   return response.data;
 };
