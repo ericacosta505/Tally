@@ -5,14 +5,32 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
+
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 # Enable CORS for all routes. Allow the local React dev server by default.
 CORS(
     app,
-    origins=["http://localhost:3000"],
+    origins=ALLOWED_ORIGINS,
     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
     supports_credentials=False,
 )
+
+
+@app.after_request
+def add_cors_headers(response):
+    """Ensure browsers always receive explicit CORS headers."""
+    origin = request.headers.get("Origin")
+    if origin and origin in ALLOWED_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Vary"] = "Origin"
+        response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization,X-Requested-With"
+    return response
 
 # Database configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -117,4 +135,3 @@ def get_summary():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
-

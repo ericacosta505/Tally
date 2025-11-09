@@ -1,6 +1,31 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const resolveDefaultBaseUrl = () => {
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  if (typeof window === 'undefined') {
+    return 'http://127.0.0.1:5000/api';
+  }
+
+  const { protocol, port } = window.location;
+
+  // When running via `npm start` (port 3000) talk to the Flask dev server directly via 127.0.0.1
+  // so we avoid IPv6/localhost resolution quirks.
+  if (port === '3000') {
+    return `${protocol}//127.0.0.1:5000/api`;
+  }
+
+  // For production builds served alongside the backend, use a relative path.
+  return '/api';
+};
+
+const API_BASE_URL = resolveDefaultBaseUrl().replace(/\/$/, '');
+
+if (process.env.NODE_ENV !== 'production') {
+  // Helpful when debugging connectivity issues locally.
+  console.info(`[BudgetTracker] Using API base URL: ${API_BASE_URL}`);
+}
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -38,4 +63,3 @@ export const healthCheck = async () => {
   const response = await api.get('/health');
   return response.data;
 };
-
