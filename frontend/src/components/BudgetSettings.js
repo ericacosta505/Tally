@@ -8,6 +8,11 @@ const BudgetSettings = ({ onUpdate }) => {
     wants_percentage: 30,
     savings_percentage: 20
   });
+  const [inputValues, setInputValues] = useState({
+    needs_percentage: '50',
+    wants_percentage: '30',
+    savings_percentage: '20'
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -20,10 +25,19 @@ const BudgetSettings = ({ onUpdate }) => {
     try {
       setLoading(true);
       const data = await getSettings();
+      const needs = data.needs_percentage || 50;
+      const wants = data.wants_percentage || 30;
+      const savings = data.savings_percentage || 20;
+      
       setSettings({
-        needs_percentage: data.needs_percentage || 50,
-        wants_percentage: data.wants_percentage || 30,
-        savings_percentage: data.savings_percentage || 20
+        needs_percentage: needs,
+        wants_percentage: wants,
+        savings_percentage: savings
+      });
+      setInputValues({
+        needs_percentage: needs.toString(),
+        wants_percentage: wants.toString(),
+        savings_percentage: savings.toString()
       });
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -34,35 +48,75 @@ const BudgetSettings = ({ onUpdate }) => {
   };
 
   const handleChange = (field, value) => {
-    const numValue = parseFloat(value) || 0;
+    // Allow empty string, single decimal point, or valid numbers
+    if (value === '' || value === '.' || /^-?\d*\.?\d*$/.test(value)) {
+      setInputValues(prev => ({
+        ...prev,
+        [field]: value
+      }));
+      
+      // Update numeric value only if it's a valid number
+      const numValue = value === '' || value === '.' ? null : parseFloat(value);
+      if (numValue !== null && !isNaN(numValue)) {
+        setSettings(prev => ({
+          ...prev,
+          [field]: numValue
+        }));
+      }
+      setMessage('');
+    }
+  };
+
+  const handleBlur = (field) => {
+    // Get the current input value
+    const inputValue = inputValues[field];
+    
+    // If empty or invalid, set to 0
+    let numValue = 0;
+    if (inputValue && inputValue !== '.' && inputValue !== '') {
+      const parsed = parseFloat(inputValue);
+      if (!isNaN(parsed)) {
+        numValue = Math.max(0, Math.min(100, parsed)); // Clamp between 0 and 100
+      }
+    }
+    
+    // Update both input and numeric values (no auto-adjustment)
+    setInputValues(prev => ({
+      ...prev,
+      [field]: numValue.toString()
+    }));
     setSettings(prev => ({
       ...prev,
       [field]: numValue
     }));
-    setMessage('');
-  };
-
-  const handleBlur = () => {
-    // Auto-adjust to ensure sum is 100
-    const total = settings.needs_percentage + settings.wants_percentage + settings.savings_percentage;
-    if (Math.abs(total - 100) > 0.01) {
-      // Distribute the difference proportionally
-      const diff = 100 - total;
-      const needs = settings.needs_percentage + (diff * (settings.needs_percentage / total));
-      const wants = settings.wants_percentage + (diff * (settings.wants_percentage / total));
-      const savings = settings.savings_percentage + (diff * (settings.savings_percentage / total));
-      
-      setSettings({
-        needs_percentage: Math.round(needs * 100) / 100,
-        wants_percentage: Math.round(wants * 100) / 100,
-        savings_percentage: Math.round(savings * 100) / 100
-      });
-    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const total = settings.needs_percentage + settings.wants_percentage + settings.savings_percentage;
+    
+    // Normalize all fields before submitting
+    const normalizedSettings = {};
+    Object.keys(inputValues).forEach(field => {
+      const inputValue = inputValues[field];
+      let numValue = 0;
+      if (inputValue && inputValue !== '.' && inputValue !== '') {
+        const parsed = parseFloat(inputValue);
+        if (!isNaN(parsed)) {
+          numValue = Math.max(0, Math.min(100, parsed));
+        }
+      }
+      normalizedSettings[field] = numValue;
+    });
+    
+    // Update both state objects
+    setSettings(normalizedSettings);
+    setInputValues({
+      needs_percentage: normalizedSettings.needs_percentage.toString(),
+      wants_percentage: normalizedSettings.wants_percentage.toString(),
+      savings_percentage: normalizedSettings.savings_percentage.toString()
+    });
+    
+    const total = normalizedSettings.needs_percentage + normalizedSettings.wants_percentage + normalizedSettings.savings_percentage;
     
     if (Math.abs(total - 100) > 0.01) {
       setMessage('Percentages must sum to 100%');
@@ -72,7 +126,7 @@ const BudgetSettings = ({ onUpdate }) => {
     try {
       setSaving(true);
       setMessage('');
-      await updateSettings(settings);
+      await updateSettings(normalizedSettings);
       setMessage('Settings saved successfully!');
       if (onUpdate) {
         onUpdate();
@@ -94,7 +148,25 @@ const BudgetSettings = ({ onUpdate }) => {
     );
   }
 
-  const total = settings.needs_percentage + settings.wants_percentage + settings.savings_percentage;
+  // Calculate total from current input values for real-time feedback
+  const calculateTotal = () => {
+    let total = 0;
+    Object.keys(inputValues).forEach(key => {
+      const value = inputValues[key];
+      if (value && value !== '' && value !== '.') {
+        const num = parseFloat(value);
+        if (!isNaN(num)) {
+          total += num;
+        }
+      } else {
+        // Use settings value if input is empty
+        total += settings[key] || 0;
+      }
+    });
+    return total;
+  };
+  
+  const total = calculateTotal();
   const isValid = Math.abs(total - 100) < 0.01;
 
   return (
@@ -110,14 +182,12 @@ const BudgetSettings = ({ onUpdate }) => {
           <div className="setting-group needs">
             <label htmlFor="needs_percentage">Needs (%)</label>
             <input
-              type="number"
+              type="text"
               id="needs_percentage"
-              value={settings.needs_percentage}
+              value={inputValues.needs_percentage}
               onChange={(e) => handleChange('needs_percentage', e.target.value)}
-              onBlur={handleBlur}
-              min="0"
-              max="100"
-              step="0.1"
+              onBlur={() => handleBlur('needs_percentage')}
+              placeholder="0"
               className="setting-input"
             />
           </div>
@@ -125,14 +195,12 @@ const BudgetSettings = ({ onUpdate }) => {
           <div className="setting-group wants">
             <label htmlFor="wants_percentage">Wants (%)</label>
             <input
-              type="number"
+              type="text"
               id="wants_percentage"
-              value={settings.wants_percentage}
+              value={inputValues.wants_percentage}
               onChange={(e) => handleChange('wants_percentage', e.target.value)}
-              onBlur={handleBlur}
-              min="0"
-              max="100"
-              step="0.1"
+              onBlur={() => handleBlur('wants_percentage')}
+              placeholder="0"
               className="setting-input"
             />
           </div>
@@ -140,14 +208,12 @@ const BudgetSettings = ({ onUpdate }) => {
           <div className="setting-group savings">
             <label htmlFor="savings_percentage">Savings (%)</label>
             <input
-              type="number"
+              type="text"
               id="savings_percentage"
-              value={settings.savings_percentage}
+              value={inputValues.savings_percentage}
               onChange={(e) => handleChange('savings_percentage', e.target.value)}
-              onBlur={handleBlur}
-              min="0"
-              max="100"
-              step="0.1"
+              onBlur={() => handleBlur('savings_percentage')}
+              placeholder="0"
               className="setting-input"
             />
           </div>
