@@ -3,6 +3,7 @@ import './App.css';
 import BudgetForm from './components/BudgetForm';
 import BudgetList from './components/BudgetList';
 import BudgetSummary from './components/BudgetSummary';
+import BudgetSettings from './components/BudgetSettings';
 import { getEntries, createEntry, updateEntry, deleteEntry, getSummary } from './services/api';
 
 function App() {
@@ -116,6 +117,8 @@ function App() {
         )}
         
         <BudgetSummary summary={summary} />
+        
+        <BudgetSettings onUpdate={loadData} />
         
         <BudgetForm
           onSubmit={editingEntry ? (data) => handleUpdate(editingEntry.id, data) : handleCreate}

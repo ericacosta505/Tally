@@ -7,7 +7,8 @@ const BudgetForm = ({ onSubmit, editingEntry, onCancel }) => {
     amount: '',
     category: '',
     date: new Date().toISOString().split('T')[0],
-    type: 'expense'
+    type: 'expense',
+    expense_category: ''
   });
 
   useEffect(() => {
@@ -17,7 +18,8 @@ const BudgetForm = ({ onSubmit, editingEntry, onCancel }) => {
         amount: editingEntry.amount || '',
         category: editingEntry.category || '',
         date: editingEntry.date || new Date().toISOString().split('T')[0],
-        type: editingEntry.type || 'expense'
+        type: editingEntry.type || 'expense',
+        expense_category: editingEntry.expense_category || ''
       });
     } else {
       setFormData({
@@ -25,7 +27,8 @@ const BudgetForm = ({ onSubmit, editingEntry, onCancel }) => {
         amount: '',
         category: '',
         date: new Date().toISOString().split('T')[0],
-        type: 'expense'
+        type: 'expense',
+        expense_category: ''
       });
     }
   }, [editingEntry]);
@@ -44,6 +47,12 @@ const BudgetForm = ({ onSubmit, editingEntry, onCancel }) => {
       alert('Please fill in all fields');
       return;
     }
+    
+    // Validate expense_category for expenses
+    if (formData.type === 'expense' && !formData.expense_category) {
+      alert('Please select a category (Need, Want, or Saving) for expenses');
+      return;
+    }
 
     const success = await onSubmit(formData);
     if (success) {
@@ -53,7 +62,8 @@ const BudgetForm = ({ onSubmit, editingEntry, onCancel }) => {
           amount: '',
           category: '',
           date: new Date().toISOString().split('T')[0],
-          type: 'expense'
+          type: 'expense',
+          expense_category: ''
         });
       }
     }
@@ -133,6 +143,25 @@ const BudgetForm = ({ onSubmit, editingEntry, onCancel }) => {
             required
           />
         </div>
+
+        {formData.type === 'expense' && (
+          <div className="form-group">
+            <label htmlFor="expense_category">Expense Category</label>
+            <select
+              id="expense_category"
+              name="expense_category"
+              value={formData.expense_category}
+              onChange={handleChange}
+              className="form-control"
+              required
+            >
+              <option value="">Select category...</option>
+              <option value="need">Need</option>
+              <option value="want">Want</option>
+              <option value="saving">Saving</option>
+            </select>
+          </div>
+        )}
 
         <div className="form-actions">
           <button type="submit" className="btn btn-primary">

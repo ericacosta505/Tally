@@ -25,7 +25,7 @@
 
 .table-header {
   display: grid;
-  grid-template-columns: 120px 1fr 120px 100px 120px 100px;
+  grid-template-columns: 120px 1fr 120px 100px 120px 100px 100px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-weight: 600;
@@ -34,7 +34,7 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: 120px 1fr 120px 100px 120px 100px;
+  grid-template-columns: 120px 1fr 120px 100px 120px 100px 100px;
   padding: 15px;
   border-bottom: 1px solid #e0e0e0;
   align-items: center;
@@ -90,6 +90,35 @@
 .type-badge.expense {
   background: #f8d7da;
   color: #721c24;
+}
+
+.expense-category-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.expense-category-badge.need {
+  background: #ffe5e5;
+  color: #c0392b;
+}
+
+.expense-category-badge.want {
+  background: #fff4e5;
+  color: #d68910;
+}
+
+.expense-category-badge.saving {
+  background: #e5f5e5;
+  color: #27ae60;
+}
+
+.expense-category-badge.empty {
+  background: #f0f0f0;
+  color: #999;
 }
 
 .btn-edit,

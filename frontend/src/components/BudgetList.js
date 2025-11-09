@@ -22,6 +22,7 @@ const BudgetList = ({ entries, onEdit, onDelete }) => {
           <div className="table-cell">Description</div>
           <div className="table-cell">Category</div>
           <div className="table-cell">Type</div>
+          <div className="table-cell">Expense Category</div>
           <div className="table-cell amount">Amount</div>
           <div className="table-cell actions">Actions</div>
         </div>
@@ -34,6 +35,15 @@ const BudgetList = ({ entries, onEdit, onDelete }) => {
               <span className={`type-badge ${entry.type}`}>
                 {entry.type}
               </span>
+            </div>
+            <div className="table-cell">
+              {entry.type === 'expense' && entry.expense_category ? (
+                <span className={`expense-category-badge ${entry.expense_category}`}>
+                  {entry.expense_category.charAt(0).toUpperCase() + entry.expense_category.slice(1)}
+                </span>
+              ) : (
+                <span className="expense-category-badge empty">-</span>
+              )}
             </div>
             <div className={`table-cell amount ${entry.type}`}>
               {entry.type === 'income' ? '+' : '-'}${entry.amount.toFixed(2)}

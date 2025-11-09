@@ -1,0 +1,141 @@
+.budget-settings {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.budget-settings h2 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.settings-description {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setting-group label {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.setting-group.needs label {
+  color: #e74c3c;
+}
+
+.setting-group.wants label {
+  color: #f39c12;
+}
+
+.setting-group.savings label {
+  color: #27ae60;
+}
+
+.setting-input {
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.setting-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.settings-total {
+  text-align: center;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.total-label {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.total-label.valid {
+  color: #27ae60;
+}
+
+.total-label.invalid {
+  color: #e74c3c;
+}
+
+.settings-message {
+  padding: 12px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.settings-message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.settings-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.btn-save-settings {
+  padding: 12px 24px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-save-settings:hover:not(:disabled) {
+  background: #357abd;
+}
+
+.btn-save-settings:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .settings-inputs {
+    grid-template-columns: 1fr;
+  }
+}
+

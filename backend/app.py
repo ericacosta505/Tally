@@ -39,6 +39,23 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# Budget Settings Model
+class BudgetSettings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    needs_percentage = db.Column(db.Float, default=50.0, nullable=False)
+    wants_percentage = db.Column(db.Float, default=30.0, nullable=False)
+    savings_percentage = db.Column(db.Float, default=20.0, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'needs_percentage': self.needs_percentage,
+            'wants_percentage': self.wants_percentage,
+            'savings_percentage': self.savings_percentage,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
 # Budget Entry Model
 class BudgetEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,6 +64,7 @@ class BudgetEntry(db.Model):
     category = db.Column(db.String(100), nullable=False)
     date = db.Column(db.String(20), nullable=False)
     type = db.Column(db.String(10), nullable=False)  # 'income' or 'expense'
+    expense_category = db.Column(db.String(20), nullable=True)  # 'need', 'want', or 'saving' (only for expenses)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -57,12 +75,22 @@ class BudgetEntry(db.Model):
             'category': self.category,
             'date': self.date,
             'type': self.type,
+            'expense_category': self.expense_category,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
-# Create tables
+# Create tables and initialize default settings
 with app.app_context():
     db.create_all()
+    # Initialize default budget settings if they don't exist
+    if BudgetSettings.query.first() is None:
+        default_settings = BudgetSettings(
+            needs_percentage=50.0,
+            wants_percentage=30.0,
+            savings_percentage=20.0
+        )
+        db.session.add(default_settings)
+        db.session.commit()
 
 # API Routes
 @app.route('/', methods=['GET'])
@@ -95,7 +123,8 @@ def create_entry():
         amount=data.get('amount'),
         category=data.get('category'),
         date=data.get('date'),
-        type=data.get('type')
+        type=data.get('type'),
+        expense_category=data.get('expense_category') if data.get('type') == 'expense' else None
     )
     db.session.add(entry)
     db.session.commit()
@@ -110,6 +139,10 @@ def update_entry(entry_id):
     entry.category = data.get('category', entry.category)
     entry.date = data.get('date', entry.date)
     entry.type = data.get('type', entry.type)
+    if data.get('type') == 'expense':
+        entry.expense_category = data.get('expense_category', entry.expense_category)
+    else:
+        entry.expense_category = None
     db.session.commit()
     return jsonify(entry.to_dict())
 
@@ -127,11 +160,75 @@ def get_summary():
     total_expenses = sum(entry.amount for entry in entries if entry.type == 'expense')
     balance = total_income - total_expenses
     
+    # Calculate needs/wants/savings breakdown
+    needs_expenses = sum(entry.amount for entry in entries if entry.type == 'expense' and entry.expense_category == 'need')
+    wants_expenses = sum(entry.amount for entry in entries if entry.type == 'expense' and entry.expense_category == 'want')
+    savings_expenses = sum(entry.amount for entry in entries if entry.type == 'expense' and entry.expense_category == 'saving')
+    uncategorized_expenses = sum(entry.amount for entry in entries if entry.type == 'expense' and not entry.expense_category)
+    
+    # Get budget settings
+    settings = BudgetSettings.query.first()
+    if settings:
+        needs_target = total_income * (settings.needs_percentage / 100)
+        wants_target = total_income * (settings.wants_percentage / 100)
+        savings_target = total_income * (settings.savings_percentage / 100)
+    else:
+        needs_target = wants_target = savings_target = 0
+    
     return jsonify({
         'total_income': total_income,
         'total_expenses': total_expenses,
-        'balance': balance
+        'balance': balance,
+        'needs_expenses': needs_expenses,
+        'wants_expenses': wants_expenses,
+        'savings_expenses': savings_expenses,
+        'uncategorized_expenses': uncategorized_expenses,
+        'needs_target': needs_target,
+        'wants_target': wants_target,
+        'savings_target': savings_target
     })
+
+@app.route('/api/settings', methods=['GET'])
+def get_settings():
+    settings = BudgetSettings.query.first()
+    if settings:
+        return jsonify(settings.to_dict())
+    else:
+        # Create default settings if none exist
+        default_settings = BudgetSettings(
+            needs_percentage=50.0,
+            wants_percentage=30.0,
+            savings_percentage=20.0
+        )
+        db.session.add(default_settings)
+        db.session.commit()
+        return jsonify(default_settings.to_dict())
+
+@app.route('/api/settings', methods=['PUT'])
+def update_settings():
+    data = request.json
+    settings = BudgetSettings.query.first()
+    
+    if not settings:
+        settings = BudgetSettings()
+        db.session.add(settings)
+    
+    needs = data.get('needs_percentage', settings.needs_percentage)
+    wants = data.get('wants_percentage', settings.wants_percentage)
+    savings = data.get('savings_percentage', settings.savings_percentage)
+    
+    # Validate that percentages sum to 100
+    total = needs + wants + savings
+    if abs(total - 100.0) > 0.01:  # Allow small floating point differences
+        return jsonify({'error': 'Percentages must sum to 100'}), 400
+    
+    settings.needs_percentage = needs
+    settings.wants_percentage = wants
+    settings.savings_percentage = savings
+    settings.updated_at = datetime.utcnow()
+    
+    db.session.commit()
+    return jsonify(settings.to_dict())
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
