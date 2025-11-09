@@ -118,19 +118,23 @@ with app.app_context():
     db.create_all()
 
 # Authentication helper functions
+# Token expires after 24 hours for security
+TOKEN_EXPIRATION_HOURS = 24
+
 def generate_token(user_id):
     payload = {
         'user_id': user_id,
-        'exp': datetime.utcnow() + timedelta(days=7)
+        'exp': datetime.utcnow() + timedelta(hours=TOKEN_EXPIRATION_HOURS)
     }
     return jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
 
 def verify_token(token):
+    """Verify JWT token and return user_id if valid, None if invalid, or 'EXPIRED' if expired."""
     try:
         payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
         return payload.get('user_id')
     except jwt.ExpiredSignatureError:
-        return None
+        return 'EXPIRED'
     except jwt.InvalidTokenError:
         return None
 
@@ -150,10 +154,25 @@ def get_current_user():
 
 def require_auth(f):
     def decorated_function(*args, **kwargs):
-        user = get_current_user()
-        if not user:
-            return jsonify({'error': 'Authentication required'}), 401
-        return f(user, *args, **kwargs)
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authentication required', 'code': 'NO_TOKEN'}), 401
+        
+        try:
+            token = auth_header.split(' ')[1]  # Format: "Bearer <token>"
+            user_id = verify_token(token)
+            
+            if user_id == 'EXPIRED':
+                return jsonify({'error': 'Token expired. Please login again', 'code': 'TOKEN_EXPIRED'}), 401
+            elif not user_id:
+                return jsonify({'error': 'Invalid token', 'code': 'INVALID_TOKEN'}), 401
+            
+            user = User.query.get(user_id)
+            if not user:
+                return jsonify({'error': 'User not found', 'code': 'USER_NOT_FOUND'}), 401
+            return f(user, *args, **kwargs)
+        except (IndexError, AttributeError):
+            return jsonify({'error': 'Invalid authorization header format', 'code': 'INVALID_HEADER'}), 401
     decorated_function.__name__ = f.__name__
     return decorated_function
 

@@ -53,9 +53,19 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid, clear auth data
+      const errorCode = error.response?.data?.code;
+      const errorMessage = error.response?.data?.error;
+      
+      // Clear auth data
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      
+      // Show message if token expired
+      if (errorCode === 'TOKEN_EXPIRED' || errorMessage?.includes('expired')) {
+        // Store message to show on login page
+        sessionStorage.setItem('expiredTokenMessage', 'Your session has expired. Please login again.');
+      }
+      
       // Redirect to login if not already there
       if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
         window.location.href = '/login';

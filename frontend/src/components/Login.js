@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
@@ -10,6 +10,15 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Check for expired token message
+  useEffect(() => {
+    const expiredMessage = sessionStorage.getItem('expiredTokenMessage');
+    if (expiredMessage) {
+      setError(expiredMessage);
+      sessionStorage.removeItem('expiredTokenMessage');
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
