@@ -18,13 +18,6 @@ services:
       - key: FRONTEND_URL
         sync: false  # Set this to your frontend URL after deployment
 
-  # PostgreSQL Database
-  - type: postgres
-    name: budget-tracker-db
-    plan: starter
-    databaseName: budget_tracker
-    user: budget_tracker_user
-
   # Frontend Static Site
   - type: web
     name: budget-tracker-frontend
@@ -35,3 +28,9 @@ services:
       - key: REACT_APP_API_URL
         sync: false  # Set this to your backend URL after deployment
 
+databases:
+  # PostgreSQL Database
+  - name: budget-tracker-db
+    plan: starter
+    databaseName: budget_tracker
+    user: budget_tracker_user
