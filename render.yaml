@@ -19,7 +19,7 @@ services:
         sync: false  # Set this to your frontend URL after deployment
 
   # PostgreSQL Database
-  - type: postgres
+  - type: pg
     name: budget-tracker-db
     plan: starter
     databaseName: budget_tracker
