@@ -31,6 +31,6 @@ services:
 databases:
   # PostgreSQL Database
   - name: budget-tracker-db
-    plan: starter
+    plan: standard-256mb
     databaseName: budget_tracker
     user: budget_tracker_user
