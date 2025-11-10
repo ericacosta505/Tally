@@ -9,10 +9,16 @@ import os
 
 app = Flask(__name__)
 
+# CORS configuration - support both development and production
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+# Add production frontend URL from environment variable if set
+frontend_url = os.environ.get('FRONTEND_URL')
+if frontend_url:
+    ALLOWED_ORIGINS.append(frontend_url)
 
 # Enable CORS for all routes. Allow the local React dev server by default.
 CORS(
@@ -36,8 +42,19 @@ def add_cors_headers(response):
     return response
 
 # Database configuration
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "budget.db")}'
+# Use PostgreSQL if DATABASE_URL is set (production), otherwise fall back to SQLite (development)
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # Render provides DATABASE_URL in format: postgresql://user:pass@host:port/dbname
+    # SQLAlchemy needs postgresql:// (not postgres://)
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Development: use SQLite
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "budget.db")}'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
@@ -446,4 +463,8 @@ def update_settings(user):
     return jsonify(settings.to_dict())
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # In production, use the PORT environment variable (Render sets this)
+    port = int(os.environ.get('PORT', 5000))
+    # Only run in debug mode if not in production
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    app.run(debug=debug, host='0.0.0.0', port=port)
