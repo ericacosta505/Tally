@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=None)
 
 # CORS configuration - support both development and production
 ALLOWED_ORIGINS = [
@@ -42,6 +42,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "budget.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+# Frontend build directory path
+FRONTEND_BUILD_DIR = os.path.join(os.path.dirname(basedir), 'frontend', 'build')
 
 db = SQLAlchemy(app)
 
@@ -179,19 +182,6 @@ def require_auth(f):
     return decorated_function
 
 # API Routes
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify({
-        'message': 'Budget Tracker API is running!',
-        'status': 'ok',
-        'endpoints': {
-            'health': '/api/health',
-            'entries': '/api/entries',
-            'summary': '/api/summary'
-        },
-        'note': 'This is a REST API. Use the React frontend at http://localhost:3000 to interact with the application.'
-    }), 200
-
 @app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'ok', 'message': 'Backend is running'}), 200
@@ -446,6 +436,30 @@ def update_settings(user):
     
     db.session.commit()
     return jsonify(settings.to_dict())
+
+# Serve static files from React build (catch-all route - must be last)
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    # Serve static files if they exist (JS, CSS, images, etc.)
+    if path and os.path.exists(os.path.join(FRONTEND_BUILD_DIR, path)):
+        return send_from_directory(FRONTEND_BUILD_DIR, path)
+    
+    # For all other routes, serve index.html (React Router will handle routing)
+    if os.path.exists(os.path.join(FRONTEND_BUILD_DIR, 'index.html')):
+        return send_from_directory(FRONTEND_BUILD_DIR, 'index.html')
+    
+    # Fallback if build directory doesn't exist (development mode)
+    return jsonify({
+        'message': 'Budget Tracker API is running!',
+        'status': 'ok',
+        'endpoints': {
+            'health': '/api/health',
+            'entries': '/api/entries',
+            'summary': '/api/summary'
+        },
+        'note': 'Frontend build not found. Please build the frontend first: cd frontend && npm run build'
+    }), 200
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
