@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import BudgetForm from './BudgetForm';
@@ -45,11 +45,7 @@ function BudgetDashboard() {
     return () => clearInterval(interval);
   }, []); // Empty dependency array - only run on mount
 
-  useEffect(() => {
-    loadData();
-  }, [selectedMonth]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -70,7 +66,11 @@ function BudgetDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedMonth]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const navigateMonth = (direction) => {
     setSelectedMonth(prev => {
