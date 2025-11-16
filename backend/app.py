@@ -44,9 +44,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
     # Render provides DATABASE_URL in the format: postgresql://user:password@host:port/dbname
-    # SQLAlchemy expects postgresql:// (not postgres://), so we may need to replace it
+    # SQLAlchemy needs to use psycopg (psycopg3) driver, so we replace the scheme
     if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        database_url = database_url.replace('postgres://', 'postgresql+psycopg://', 1)
+    elif database_url.startswith('postgresql://'):
+        database_url = database_url.replace('postgresql://', 'postgresql+psycopg://', 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
     # Fall back to SQLite for local development
