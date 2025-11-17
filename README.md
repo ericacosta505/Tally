@@ -2,6 +2,12 @@
 
 A full-stack personal budget tracking application that helps you manage your finances using the 50/30/20 budgeting rule (Needs/Wants/Savings). Track your income and expenses, visualize your spending patterns, and stay on top of your financial goals.
 
+## 🌐 Live Application
+
+**Try it now:** [https://budget-3a0l.onrender.com](https://budget-3a0l.onrender.com)
+
+The application is live and ready to use! Create an account to start tracking your budget.
+
 ## 📋 Table of Contents
 
 - [Features](#features)
@@ -147,7 +153,17 @@ npm install
 
 ## 🏃 Running the Application
 
+### Using the Live Application
+
+The easiest way to use the Budget Tracker is through the live deployment:
+
+**👉 [Access the live application](https://budget-3a0l.onrender.com)**
+
+Simply visit the link above, create an account, and start tracking your budget!
+
 ### Development Mode
+
+If you want to run the application locally for development or customization, follow the instructions below.
 
 The application runs in development mode with separate servers for frontend and backend.
 
@@ -192,6 +208,7 @@ The application will be available at `http://localhost:5000`
 ## 📡 API Documentation
 
 ### Base URL
+- **Live Application**: `https://budget-3a0l.onrender.com/api`
 - Development: `http://localhost:5000/api`
 - Production: `/api` (relative path)
 
