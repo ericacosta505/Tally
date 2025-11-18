@@ -8,20 +8,6 @@ A full-stack personal budget tracking application that helps you manage your fin
 
 The application is live and ready to use! Create an account to start tracking your budget.
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Running the Application](#running-the-application)
-- [API Documentation](#api-documentation)
-- [Environment Variables](#environment-variables)
-- [Database](#database)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-
 ## ✨ Features
 
 ### User Authentication
