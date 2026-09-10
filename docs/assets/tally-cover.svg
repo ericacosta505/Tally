@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="520" viewBox="0 0 1600 520" fill="none" role="img" aria-labelledby="title description">
+  <title id="title">Tally — Your money, in focus.</title>
+  <desc id="description">Tally is a personal finance workspace. A chartreuse tally mark and dark ink typography introduce the project.</desc>
+  <rect width="1600" height="520" rx="24" fill="#252D22"/>
+  <path d="M70 88H1530M70 433H1530" stroke="#46503D"/>
+  <text x="72" y="58" fill="#C9EE92" font-family="Arial, Helvetica, sans-serif" font-size="14" letter-spacing="4">PERSONAL FINANCE, WITH PERSPECTIVE.</text>
+  <text x="1528" y="58" text-anchor="end" fill="#9EAC91" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="2">THE TALLY WORKSPACE</text>
+  <rect x="70" y="132" width="194" height="244" rx="15" fill="#D3F58B"/>
+  <g stroke="#2A3524" stroke-width="11" stroke-linecap="square">
+    <path d="M111 181V328M146 181V328M181 181V328M216 181V328M92 312L235 198"/>
+  </g>
+  <text x="306" y="243" fill="#F5F8EE" font-family="Arial, Helvetica, sans-serif" font-size="130" font-weight="700" letter-spacing="-8">tally<tspan fill="#D3F58B">.</tspan></text>
+  <text x="310" y="317" fill="#F5F8EE" font-family="Arial, Helvetica, sans-serif" font-size="39" letter-spacing="-1">Your money, in focus.</text>
+  <text x="312" y="361" fill="#A8B69B" font-family="Arial, Helvetica, sans-serif" font-size="20">A little clarity. A lot more possibility.</text>
+  <path d="M1020 148V372" stroke="#46503D"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="1064" y="175" fill="#93A781" font-size="12" letter-spacing="3">FROM THE EVERYDAY</text>
+    <text x="1064" y="216" fill="#E7EEDD" font-size="24">Understand your spending.</text>
+    <text x="1064" y="262" fill="#E7EEDD" font-size="24">Give your money direction.</text>
+    <text x="1064" y="308" fill="#E7EEDD" font-size="24">Make room for what’s next.</text>
+    <text x="1064" y="355" fill="#D3F58B" font-size="12" letter-spacing="3">TO THE BIGGER PICTURE</text>
+  </g>
+  <text x="72" y="481" fill="#9EAC91" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="2">SPENDING  /  BUDGETS  /  RECURRING  /  FORECASTS</text>
+  <text x="1528" y="481" text-anchor="end" fill="#C9EE92" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="2">BUILT WITH REACT + FLASK</text>
+</svg>

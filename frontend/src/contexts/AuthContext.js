@@ -1,78 +1,79 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { signup, login as loginApi } from '../services/api';
-
+import { signup, login as loginApi, setSessionToken } from '../services/api';
 const AuthContext = createContext();
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    // Check for stored token on mount
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    try {
+      const storedToken = localStorage.getItem('token');
+      const parsed = JSON.parse(localStorage.getItem('user') || 'null');
+      if (
+        storedToken &&
+        parsed &&
+        typeof parsed.first_name === 'string' &&
+        typeof parsed.last_name === 'string'
+      ) {
+        setToken(storedToken);
+        setSessionToken(storedToken);
+        setUser(parsed);
+      }
+    } catch (_) {
+      /* An invalid or unavailable cache must not block the demo. */
     }
     setLoading(false);
   }, []);
-
-  const handleSignup = async (userData) => {
+  const authenticate = async (request) => {
     try {
-      const response = await signup(userData);
+      const response = await request();
+      if (!response?.token || !response?.user) throw new Error('Invalid server response');
+      setSessionToken(response.token);
       setToken(response.token);
       setUser(response.user);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      try {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+      } catch (_) {
+        /* Keep the session in memory if persistence is unavailable. */
+      }
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Signup failed. Please try again.';
-      return { success: false, error: errorMessage };
+      return {
+        success: false,
+        error:
+          error.response?.data?.error ||
+          'We couldn’t reach the account server. Please try again, or explore the demo.',
+      };
     }
   };
-
-  const handleLogin = async (email, password) => {
-    try {
-      const response = await loginApi(email, password);
-      setToken(response.token);
-      setUser(response.user);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      return { success: true };
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Login failed. Please check your credentials.';
-      return { success: false, error: errorMessage };
-    }
-  };
-
-  const handleLogout = () => {
+  const logout = () => {
     setToken(null);
+    setSessionToken(null);
     setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    } catch (_) {}
   };
-
-  const value = {
-    user,
-    token,
-    isAuthenticated: !!token,
-    signup: handleSignup,
-    login: handleLogin,
-    logout: handleLogout,
-    loading
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated: !!token,
+        signup: (data) => authenticate(() => signup(data)),
+        login: (email, password) => authenticate(() => loginApi(email, password)),
+        logout,
+        loading,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
-

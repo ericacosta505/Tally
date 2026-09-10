@@ -1,553 +1,195 @@
-# 💰 Budget Tracker
+<p align="center">
+  <img src="docs/assets/tally-cover.svg" alt="Tally — Your money, in focus. A personal finance workspace built with React and Flask." width="100%" />
+</p>
 
-A full-stack personal budget tracking application that helps you manage your finances using the 50/30/20 budgeting rule (Needs/Wants/Savings). Track your income and expenses, visualize your spending patterns, and stay on top of your financial goals.
+<p align="center">
+  <strong>A personal finance workspace for your everyday, and everything next.</strong><br />
+  Understand your spending. Build a plan. See what a small change could make possible.
+</p>
 
-## 🌐 Live Application
+<p align="center">
+  <code>React</code> &nbsp; <code>Python / Flask</code> &nbsp; <code>Chart.js</code> &nbsp; <code>SQLAlchemy</code> &nbsp; <code>SQLite / PostgreSQL</code>
+</p>
 
-**Try it now:** [https://budget-3a0l.onrender.com](https://budget-3a0l.onrender.com)
+<p align="center">
+  <a href="#the-workspace">The workspace</a> &nbsp;·&nbsp;
+  <a href="#try-it-locally">Try it locally</a> &nbsp;·&nbsp;
+  <a href="#under-the-surface">Engineering</a> &nbsp;·&nbsp;
+  <a href="docs/CASE_STUDY.md">Case study</a> &nbsp;·&nbsp;
+  <a href="docs/DEVELOPMENT.md">Developer guide</a>
+</p>
 
-The application is live and ready to use! Create an account to start tracking your budget.
+<br />
 
-## ✨ Features
+![Tally’s overview showing monthly available money, income, spending, savings, spending history, category totals, and recent transactions. All values are sample demo data.](docs/assets/tally-overview.png)
 
-### User Authentication
-- Secure user registration and login
-- JWT-based authentication with token expiration
-- Protected routes and API endpoints
-- Session management
+<p align="center"><sub>The actual Tally workspace, using sample data. Ink, chartreuse, and a little more clarity.</sub></p>
 
-### Budget Management
-- **Income & Expense Tracking**: Add, edit, and delete financial entries
-- **Categorization**: Organize expenses into custom categories
-- **50/30/20 Rule**: Automatically categorize expenses as Needs, Wants, or Savings
-- **Customizable Budget Settings**: Adjust the percentage allocation for Needs/Wants/Savings
-- **Monthly View**: Navigate between months to view historical data
-- **Real-time Summary**: View total income, expenses, and balance at a glance
+## The workspace
 
-### Visualizations
-- Interactive charts showing spending breakdown
-- Progress bars for Needs/Wants/Savings categories
-- Visual comparison of actual spending vs. budget targets
+A number is more useful when you know what to do with it. Tally connects the whole journey:
 
-### User Experience
-- Responsive design
-- Month navigation with quick access to current month
-- Form validation and error handling
-- Loading states and error messages
-- Automatic data refresh
+**Notice a pattern → inspect the evidence → adjust your plan → see the effect.**
 
-## 🛠 Tech Stack
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>01 &nbsp; See the bigger picture</h3>
+      <p>Income, spending, savings, and available money in one view. Compare monthly spending and open the transactions behind a category.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>02 &nbsp; Make the details yours</h3>
+      <p>Add, edit, and categorize transactions. Combine search and filters, explore your history, and export exactly what you’re looking at.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>03 &nbsp; Build a balance that fits</h3>
+      <p>Customize your Needs / Wants / Savings plan. See recorded activity, estimated recurring commitments, and what remains after both.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>04 &nbsp; Know what keeps coming back</h3>
+      <p>Discover monthly merchant patterns and possible price increases. Open the actual charges behind each insight.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>05 &nbsp; Explore what comes next</h3>
+      <p>Adjust future variable spending and watch a month-end cash scenario change. The assumptions are visible beside the result.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>06 &nbsp; Start where you are</h3>
+      <p>Explore a complete demo immediately, or create an account with a separate, empty ledger. Demo edits stay in your browser.</p>
+    </td>
+  </tr>
+</table>
 
-### Backend
-- **Flask 3.0.0** - Python web framework
-- **Flask-SQLAlchemy 3.1.1** - ORM for database operations
-- **Flask-CORS 4.0.0** - Cross-origin resource sharing
-- **PyJWT 2.8.0** - JSON Web Token implementation
-- **Werkzeug 3.1.3** - Password hashing and security utilities
-- **python-dateutil 2.9.0** - Date parsing and manipulation
-- **SQLite** (development) / **PostgreSQL** (production)
-- **Gunicorn** - Production WSGI server
+<details>
+<summary><strong>A closer look: the what-if corner</strong></summary>
 
-### Frontend
-- **React 18.2.0** - UI library
-- **React Router DOM 7.9.5** - Client-side routing
-- **Axios 1.6.2** - HTTP client for API requests
-- **Chart.js 4.4.0** - Data visualization
-- **React-Chartjs-2 5.2.0** - React wrapper for Chart.js
+<br />
 
-## 📁 Project Structure
+![Tally’s forecast with a 25 percent reduction in future variable spending, showing the estimated effect on month-end available money and the calculation’s assumptions.](docs/assets/tally-forecast.png)
 
-```
-Budget/
-├── backend/
-│   ├── app.py                 # Flask application and API routes
-│   ├── budget.db              # SQLite database (development)
-│   ├── requirements.txt       # Python dependencies
-│   └── venv/                  # Python virtual environment
-│
-├── frontend/
-│   ├── public/
-│   │   └── index.html         # HTML template
-│   ├── src/
-│   │   ├── App.js             # Main React component and routing
-│   │   ├── index.js           # React entry point
-│   │   ├── components/        # React components
-│   │   │   ├── BudgetDashboard.js
-│   │   │   ├── BudgetForm.js
-│   │   │   ├── BudgetList.js
-│   │   │   ├── BudgetSummary.js
-│   │   │   ├── BudgetCharts.js
-│   │   │   ├── BudgetSettings.js
-│   │   │   ├── Login.js
-│   │   │   ├── Signup.js
-│   │   │   └── ProtectedRoute.js
-│   │   ├── contexts/
-│   │   │   └── AuthContext.js # Authentication context
-│   │   └── services/
-│   │       └── api.js         # API service functions
-│   ├── package.json           # Node.js dependencies
-│   └── package-lock.json
-│
-└── README.md                  # This file
-```
+In this sample scenario, reducing **unrecorded future variable spending by 25%** leaves an estimated **$147.19** more at month end. Already recorded expenses and savings stay unchanged. It’s a scenario to explore, not a guaranteed outcome.
 
-## 📦 Prerequisites
+</details>
 
-Before you begin, ensure you have the following installed:
+## Try it locally
 
-- **Python 3.8+** (Python 3.14 recommended)
-- **Node.js 14+** and **npm** (or **yarn**)
-- **PostgreSQL** (optional, for production deployment)
+The quickest way in is the demo. It runs entirely in the browser with three months of sample activity.
 
-## 🚀 Installation
-
-### 1. Clone the Repository
+**Prerequisite:** Node.js 20+ and npm. From your local checkout:
 
 ```bash
-git clone <repository-url>
-cd Budget
-```
-
-### 2. Backend Setup
-
-```bash
-# Navigate to backend directory
-cd backend
-
-# Create a virtual environment (if not already created)
-python3 -m venv venv
-
-# Activate virtual environment
-# On macOS/Linux:
-source venv/bin/activate
-# On Windows:
-# venv\Scripts\activate
-
-# Install Python dependencies
-pip install -r requirements.txt
-```
-
-### 3. Frontend Setup
-
-```bash
-# Navigate to frontend directory (from project root)
 cd frontend
-
-# Install Node.js dependencies
-npm install
-```
-
-## 🏃 Running the Application
-
-### Using the Live Application
-
-The easiest way to use the Budget Tracker is through the live deployment:
-
-**👉 [Access the live application](https://budget-3a0l.onrender.com)**
-
-Simply visit the link above, create an account, and start tracking your budget!
-
-### Development Mode
-
-If you want to run the application locally for development or customization, follow the instructions below.
-
-The application runs in development mode with separate servers for frontend and backend.
-
-#### Start the Backend Server
-
-```bash
-# From the backend directory
-cd backend
-source venv/bin/activate  # Activate virtual environment
-python app.py
-```
-
-The backend server will start on `http://localhost:5000`
-
-#### Start the Frontend Development Server
-
-```bash
-# From the frontend directory (in a new terminal)
-cd frontend
+npm ci
 npm start
 ```
 
-The frontend will start on `http://localhost:3000` and automatically open in your browser.
+Open [localhost:3000](http://localhost:3000). Explore without an account, backend, API key, or bank connection.
 
-### Production Mode
+**Take a quick tour:**
 
-For production, build the frontend and serve it through Flask:
+1. Open a spending category and inspect the transactions behind its total.
+2. Edit a transaction, then return to see the updated overview and budget.
+3. Expand a recurring merchant to compare its recent charges.
+4. Move the forecast slider and follow the change in projected available money.
+
+Demo edits persist on this device. **About & shortcuts → Reset demo** restores the sample workspace.
+
+| Find your way                         | Shortcut                                      |
+| :------------------------------------ | :-------------------------------------------- |
+| Search transactions or jump to a page | <kbd>⌘</kbd> / <kbd>Ctrl</kbd> + <kbd>K</kbd> |
+| Add a transaction                     | <kbd>N</kbd>                                  |
+| Close a dialog                        | <kbd>Esc</kbd>                                |
+
+<details>
+<summary><strong>Run account-backed workspaces, too</strong></summary>
+
+Python 3.10+ is required. In a second terminal, from the repository root:
 
 ```bash
-# Build the React app
-cd frontend
-npm run build
-
-# Start the Flask server (from backend directory)
-cd ../backend
-source venv/bin/activate
-python app.py
-```
-
-The application will be available at `http://localhost:5000`
-
-## 📡 API Documentation
-
-### Base URL
-- **Live Application**: `https://budget-3a0l.onrender.com/api`
-- Development: `http://localhost:5000/api`
-- Production: `/api` (relative path)
-
-### Authentication
-
-All protected endpoints require a JWT token in the Authorization header:
-```
-Authorization: Bearer <token>
-```
-
-### Endpoints
-
-#### Health Check
-```
-GET /api/health
-```
-Returns the API status.
-
-**Response:**
-```json
-{
-  "status": "ok",
-  "message": "Backend is running"
-}
-```
-
-#### Authentication
-
-##### Sign Up
-```
-POST /api/auth/signup
-```
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword",
-  "phone_number": "+1234567890",
-  "date_of_birth": "1990-01-01",
-  "first_name": "John",
-  "last_name": "Doe"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "User created successfully",
-  "token": "jwt_token_here",
-  "user": {
-    "id": 1,
-    "email": "user@example.com",
-    "first_name": "John",
-    "last_name": "Doe",
-    ...
-  }
-}
-```
-
-##### Login
-```
-POST /api/auth/login
-```
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Login successful",
-  "token": "jwt_token_here",
-  "user": { ... }
-}
-```
-
-#### Budget Entries
-
-##### Get All Entries
-```
-GET /api/entries?month=1&year=2024
-```
-Returns all budget entries for the authenticated user. Optional query parameters for filtering by month and year.
-
-**Response:**
-```json
-[
-  {
-    "id": 1,
-    "description": "Grocery Shopping",
-    "amount": 150.00,
-    "category": "Food",
-    "date": "2024-01-15",
-    "type": "expense",
-    "expense_category": "need",
-    "created_at": "2024-01-15T10:30:00"
-  }
-]
-```
-
-##### Create Entry
-```
-POST /api/entries
-```
-
-**Request Body:**
-```json
-{
-  "description": "Salary",
-  "amount": 5000.00,
-  "category": "Employment",
-  "date": "2024-01-01",
-  "type": "income"
-}
-```
-
-For expenses, include `expense_category`:
-```json
-{
-  "description": "Rent",
-  "amount": 1200.00,
-  "category": "Housing",
-  "date": "2024-01-01",
-  "type": "expense",
-  "expense_category": "need"
-}
-```
-
-##### Update Entry
-```
-PUT /api/entries/<entry_id>
-```
-
-**Request Body:** Same as create entry.
-
-##### Delete Entry
-```
-DELETE /api/entries/<entry_id>
-```
-
-#### Budget Summary
-```
-GET /api/summary?month=1&year=2024
-```
-Returns financial summary for the authenticated user. Optional query parameters for filtering by month and year.
-
-**Response:**
-```json
-{
-  "total_income": 5000.00,
-  "total_expenses": 3500.00,
-  "balance": 1500.00,
-  "needs_expenses": 2500.00,
-  "wants_expenses": 800.00,
-  "savings_expenses": 200.00,
-  "uncategorized_expenses": 0.00,
-  "needs_target": 2500.00,
-  "wants_target": 1500.00,
-  "savings_target": 1000.00
-}
-```
-
-#### Budget Settings
-
-##### Get Settings
-```
-GET /api/settings
-```
-Returns the user's budget allocation percentages.
-
-**Response:**
-```json
-{
-  "id": 1,
-  "needs_percentage": 50.0,
-  "wants_percentage": 30.0,
-  "savings_percentage": 20.0,
-  "updated_at": "2024-01-15T10:30:00"
-}
-```
-
-##### Update Settings
-```
-PUT /api/settings
-```
-
-**Request Body:**
-```json
-{
-  "needs_percentage": 50.0,
-  "wants_percentage": 30.0,
-  "savings_percentage": 20.0
-}
-```
-
-**Note:** Percentages must sum to exactly 100.
-
-## 🔐 Environment Variables
-
-### Backend
-
-Create a `.env` file in the `backend` directory (optional for development):
-
-```env
-# Database (optional - defaults to SQLite)
-DATABASE_URL=postgresql://user:password@localhost:5432/budget_db
-
-# Secret key for JWT tokens (required in production)
-SECRET_KEY=your-secret-key-here
-
-# Port (optional - defaults to 5000)
-PORT=5000
-```
-
-### Frontend
-
-Create a `.env` file in the `frontend` directory (optional):
-
-```env
-# API URL (optional - auto-detected in development)
-REACT_APP_API_URL=http://localhost:5000/api
-```
-
-## 🗄 Database
-
-### Development
-The application uses SQLite by default for development. The database file (`budget.db`) is automatically created in the `backend` directory when you first run the application.
-
-### Production
-For production, set the `DATABASE_URL` environment variable to use PostgreSQL:
-
-```env
-DATABASE_URL=postgresql://user:password@host:port/database
-```
-
-### Database Models
-
-- **User**: Stores user account information
-- **BudgetEntry**: Stores income and expense entries
-- **BudgetSettings**: Stores user's budget allocation percentages
-
-The database tables are automatically created when the Flask application starts.
-
-## 🚢 Deployment
-
-### Backend Deployment (e.g., Render, Heroku)
-
-1. Set environment variables:
-   - `DATABASE_URL` (PostgreSQL connection string)
-   - `SECRET_KEY` (strong random secret key)
-   - `PORT` (usually set automatically by hosting platform)
-
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Run migrations (if needed):
-   ```bash
-   python app.py  # Tables are auto-created
-   ```
-
-4. Start with Gunicorn:
-   ```bash
-   gunicorn -w 4 -b 0.0.0.0:$PORT app:app
-   ```
-
-### Frontend Deployment
-
-1. Build the React app:
-   ```bash
-   cd frontend
-   npm run build
-   ```
-
-2. The `build` folder can be:
-   - Served by the Flask backend (already configured)
-   - Deployed to static hosting (Netlify, Vercel, etc.)
-   - If deploying separately, set `REACT_APP_API_URL` to your backend URL
-
-### Full-Stack Deployment
-
-The Flask backend is configured to serve the React build files. After building the frontend:
-
-1. Ensure `frontend/build` directory exists
-2. Deploy the backend with the frontend build included
-3. The Flask app will serve both API and frontend routes
-
-## 🧪 Testing
-
-### Backend Testing
-```bash
+python3 -m venv backend/.venv
+backend/.venv/bin/pip install -r backend/requirements.txt
 cd backend
-source venv/bin/activate
-# Add your test commands here
+TALLY_DEV=1 .venv/bin/python app.py
 ```
 
-### Frontend Testing
+The API runs on port **5000** alongside the frontend on port **3000**. A new account starts with its own empty ledger.
+
+`TALLY_DEV=1` creates a temporary signing key for local development. Configure a strong `SECRET_KEY` for persistent sessions and deployment. See the [developer guide](docs/DEVELOPMENT.md) for environment variables, PostgreSQL, API details, and Docker deployment.
+
+</details>
+
+## Under the surface
+
+One ledger connects the interface. Two explicit storage paths keep the demo and account experience separate.
+
+```mermaid
+flowchart LR
+  UI[React workspace] <--> Ledger[Shared ledger adapter]
+  Ledger --> Logic[Financial calculations]
+  Ledger <--> Demo[Device-local demo]
+  Ledger <-->|Authenticated API| API[Flask + SQLAlchemy]
+  API <--> DB[(SQLite / PostgreSQL)]
+
+  classDef ink fill:#293522,stroke:#293522,color:#f4f8ed
+  classDef lime fill:#d3f58b,stroke:#a2c867,color:#293522
+  classDef light fill:#f3f6ed,stroke:#ccd8bc,color:#293522
+  class UI,API ink
+  class Ledger lime
+  class Logic,Demo,DB light
+```
+
+| Decision                            | What it makes possible                                                                                                       |
+| :---------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| **A shared source of truth**        | A transaction correction updates the overview, budgets, recurring patterns, and forecast.                                    |
+| **Session-bound mutations**         | Late account responses cannot repopulate the demo after logout; concurrent completed writes merge into the latest state.     |
+| **Explainable financial logic**     | Recurrence uses inspectable monthly patterns. Forecasts use recorded income, recurring estimates, and elapsed spending pace. |
+| **Cents and Decimal calculations**  | Predictable monetary totals, validated positive amounts, and consistent rounding at financial boundaries.                    |
+| **Server-confirmed account writes** | Failed requests surface an error instead of appearing as successful edits.                                                   |
+
+The existing database amount column remains a float for compatibility; an integer-cents migration is documented in the [case study](docs/CASE_STUDY.md#engineering-decisions-worth-discussing).
+
+## Built to be checked
+
+**36 regression tests in the last verified run:** 23 frontend checks and 13 API checks. Coverage includes financial edge cases, cross-account access, asynchronous session races, malformed inputs, recurring dates, and transaction editing.
+
+[GitHub Actions](.github/workflows/ci.yml) is configured to run tests and the production build on pushes and pull requests. Results and remaining validation scope are recorded in the [verification notes](docs/VERIFICATION.md).
+
+<details>
+<summary><strong>Run the checks</strong></summary>
+
+From the repository root:
+
 ```bash
-cd frontend
-npm test
+# Frontend tests and production build
+npm --prefix frontend test -- --watchAll=false --runInBand --watchman=false
+npm --prefix frontend run build
+
+# Backend tests, after installing the Python dependencies
+cd backend
+.venv/bin/python -m unittest discover -s tests -v
 ```
 
-## 🤝 Contributing
+Backend tests use a temporary SQLite database. Your working ledger is not modified.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+</details>
 
-## 📝 License
+## Keep exploring
 
-This project is open source and available under the [MIT License](LICENSE).
+| Read                                       | What’s inside                                                                              |
+| :----------------------------------------- | :----------------------------------------------------------------------------------------- |
+| [Product case study](docs/CASE_STUDY.md)   | The problem, visual direction, product decisions, tradeoffs, and a two-minute walkthrough. |
+| [Developer guide](docs/DEVELOPMENT.md)     | Full-stack setup, accounting rules, API reference, configuration, and deployment.          |
+| [Verification notes](docs/VERIFICATION.md) | Recorded test results, coverage, and remaining launch checks.                              |
 
-## 🐛 Troubleshooting
+Tally is an independent portfolio project. It uses manually recorded transactions and transparent estimates; it does not connect to banks, move money, or cancel subscriptions. The current experience is available locally. Production hardening and inherited tooling limitations are documented in the guides above.
 
-### Backend Issues
+<br />
 
-**Database connection errors:**
-- Ensure SQLite file permissions are correct
-- For PostgreSQL, verify `DATABASE_URL` is correctly formatted
-
-**CORS errors:**
-- Check that `ALLOWED_ORIGINS` in `app.py` includes your frontend URL
-- Verify CORS headers are being sent
-
-**Token expiration:**
-- Tokens expire after 24 hours
-- Users will be automatically redirected to login
-
-### Frontend Issues
-
-**API connection errors:**
-- Ensure backend server is running on port 5000
-- Check `REACT_APP_API_URL` environment variable
-- Verify CORS is properly configured
-
-**Build errors:**
-- Delete `node_modules` and `package-lock.json`, then run `npm install` again
-- Ensure Node.js version is compatible (14+)
-
-## 📧 Support
-
-For issues, questions, or contributions, please open an issue on the GitHub repository.
-
----
-
-**Happy Budgeting! 💰**
-
+<p align="center">
+  <img src="frontend/public/favicon.svg" alt="Tally mark" width="34" height="34" /><br /><br />
+  <strong>A little more intentional.</strong>
+</p>

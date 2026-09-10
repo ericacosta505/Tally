@@ -24,20 +24,26 @@ const API_BASE_URL = resolveDefaultBaseUrl().replace(/\/$/, '');
 
 if (process.env.NODE_ENV !== 'production') {
   // Helpful when debugging connectivity issues locally.
-  console.info(`[BudgetTracker] Using API base URL: ${API_BASE_URL}`);
+  console.info(`[Tally] Using API base URL: ${API_BASE_URL}`);
 }
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 12000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add token to requests if available
+let sessionToken = null;
+export const setSessionToken = (value) => {
+  sessionToken = value;
+};
+
+// Add only the current session token to requests.
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = sessionToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -45,34 +51,46 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Handle 401 errors (unauthorized)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (
+      error.response?.status === 401 &&
+      error.config?.headers?.Authorization === `Bearer ${sessionToken}` &&
+      !error.config?.url?.startsWith('/auth/')
+    ) {
       const errorCode = error.response?.data?.code;
       const errorMessage = error.response?.data?.error;
-      
+
       // Clear auth data
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      
+      sessionToken = null;
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } catch (_) {}
+
       // Show message if token expired
       if (errorCode === 'TOKEN_EXPIRED' || errorMessage?.includes('expired')) {
         // Store message to show on login page
-        sessionStorage.setItem('expiredTokenMessage', 'Your session has expired. Please login again.');
+        try {
+          sessionStorage.setItem(
+            'expiredTokenMessage',
+            'Your session has expired. Please sign in again.',
+          );
+        } catch (_) {}
       }
-      
+
       // Redirect to login if not already there
       if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
         window.location.href = '/login';
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export const getEntries = async (month = null, year = null) => {

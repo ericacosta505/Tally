@@ -1,0 +1,11 @@
+.git
+**/node_modules
+**/.venv
+**/venv
+**/__pycache__
+**/*.db
+**/*.sqlite*
+**/.env
+**/.env.local
+**/.env.*.local
+frontend/build
