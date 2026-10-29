@@ -6,7 +6,7 @@ Setup, financial calculations, API reference, and deployment for Tally.
 
 ## Run the full stack
 
-Use Node.js 20+ and Python 3.10+. The repository retains its React Scripts build and Python API architecture.
+Use Node.js 26.13.0, npm 12.2.1, and Python 3.15.2. The frontend uses Vite and Vitest; the API uses Flask.
 
 ```bash
 # From the repository root
@@ -43,18 +43,18 @@ The frontend runs on port **3000**, the API on **5000**. Creating an account sta
 
 ```text
 frontend/src/
-├── contexts/AuthContext.js       Account session and safe cache recovery
+├── contexts/AuthContext.jsx       Account session and safe cache recovery
 ├── services/api.js               Authenticated API adapter
 ├── lib/
 │   ├── finance.js                Pure accounting, recurrence, forecast, CSV logic
 │   └── demo.js                   Seed generation and validated local persistence
 └── workspace/
-    ├── Workspace.js              Navigation, shortcuts, dialogs, month state
+    ├── Workspace.jsx              Navigation, shortcuts, dialogs, month state
     ├── useLedger.js              Shared data source; demo / account separation
-    ├── Overview.js + Charts.js    Financial overview and visualizations
-    ├── Views.js                  Transactions, budgets, recurring, forecast
-    ├── Dialogs.js                Entry editing, budget settings, search
-    └── AuthPage.js               Account entry points
+    ├── Overview.jsx + Charts.jsx    Financial overview and visualizations
+    ├── Views.jsx                  Transactions, budgets, recurring, forecast
+    ├── Dialogs.jsx                Entry editing, budget settings, search
+    └── AuthPage.jsx               Account entry points
 
 backend/
 ├── app.py                        Flask routes, models, validation, auth
@@ -68,7 +68,7 @@ One ledger feeds all views. Account writes are committed to the interface only a
 ```bash
 # Frontend accounting and async data-isolation tests
 cd frontend
-CI=true npm test -- --watchAll=false --runInBand --watchman=false
+npm test
 npm run build
 
 # Backend tests
@@ -119,7 +119,7 @@ Configure `SECRET_KEY` and a persistent `DATABASE_URL` (PostgreSQL is supported)
 gunicorn --bind 0.0.0.0:5000 --workers 2 app:app
 ```
 
-When deploying to a provider that supplies a port, use that port in the bind address. For a separately hosted frontend, set `REACT_APP_API_URL` before building and configure the backend’s comma-separated `ALLOWED_ORIGINS` to include that frontend’s exact origin. Never put server secrets in `REACT_APP_*` variables.
+When deploying to a provider that supplies a port, use that port in the bind address. For a separately hosted frontend, set `VITE_API_URL` before building and configure the backend’s comma-separated `ALLOWED_ORIGINS` to include that frontend’s exact origin. Never put server secrets in `REACT_APP_*` variables.
 
 The included [Dockerfile](../Dockerfile) builds the frontend and serves the complete application through Gunicorn. Persist the database externally; the container’s default SQLite file is ephemeral.
 
@@ -129,4 +129,4 @@ This revamp has not replaced the old public deployment. Flask requires a Python 
 
 Tally is an independent portfolio project, with no Ramp affiliation. It does not connect to banks, move money, cancel subscriptions, or claim financial advice. Recurrence and forecasting are transparent estimates.
 
-Before handling real customer financial data, the next work is account recovery and verification, rate limiting, a managed secret/session policy, HTTP-only cookie sessions, audited database migrations, an integer-cents storage migration, and modernization of the inherited React Scripts toolchain. The current account schema also retains phone and birth-date fields; a migration should remove these unnecessary fields. See the [case study](CASE_STUDY.md) for the reasoning behind the current scope.
+Before handling real customer financial data, the next work is account recovery and verification, rate limiting, a managed secret/session policy, HTTP-only cookie sessions, audited database migrations, an integer-cents storage migration, and modernization of the inherited Vite toolchain. The current account schema also retains phone and birth-date fields; a migration should remove these unnecessary fields. See the [case study](CASE_STUDY.md) for the reasoning behind the current scope.

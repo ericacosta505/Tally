@@ -6,7 +6,7 @@
 - 13 backend tests passed against a temporary SQLite database.
 - Optimized production build passed.
 - The updated API started under Gunicorn 26.2.0 and returned a successful health response.
-- Compatible npm updates reduced reported advisories from 62 (including 2 critical) to 30 (9 low, 7 moderate, 14 high), concentrated in the inherited React Scripts build/test/development dependency tree. No forced breaking upgrade was applied.
+- Compatible npm updates reduced reported advisories from 62 (including 2 critical) to 30 (9 low, 7 moderate, 14 high), concentrated in the inherited Vite build/test/development dependency tree. No forced breaking upgrade was applied.
 - Flask, Flask-CORS, PyJWT, Werkzeug, and Gunicorn were upgraded to verified patched releases and the API suite was rerun.
 
 ## Automated scope
@@ -21,7 +21,7 @@
 
 ```bash
 cd frontend
-CI=true npm test -- --watchAll=false --runInBand --watchman=false
+npm test
 npm run build
 ```
 

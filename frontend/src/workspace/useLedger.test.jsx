@@ -1,15 +1,16 @@
+import { vi } from "vitest";
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import useLedger from './useLedger';
 import * as api from '../services/api';
 import { DEFAULT_SETTINGS } from '../lib/finance';
-jest.mock('../services/api', () => ({
-  getEntries: jest.fn(),
-  getSettings: jest.fn(),
-  createEntry: jest.fn(),
-  updateEntry: jest.fn(),
-  deleteEntry: jest.fn(),
-  updateSettings: jest.fn(),
+vi.mock('../services/api', () => ({
+  getEntries: vi.fn(),
+  getSettings: vi.fn(),
+  createEntry: vi.fn(),
+  updateEntry: vi.fn(),
+  deleteEntry: vi.fn(),
+  updateSettings: vi.fn(),
 }));
 let root, container, ledger;
 const auth = { isAuthenticated: true, loading: false, token: 'alice-token' };
@@ -34,7 +35,7 @@ const render = (identity) =>
 beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
   localStorage.clear();
-  jest.resetAllMocks();
+  vi.resetAllMocks();
   api.getEntries.mockResolvedValue([makeEntry(1)]);
   api.getSettings.mockResolvedValue(DEFAULT_SETTINGS);
   container = document.createElement('div');

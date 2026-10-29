@@ -1,6 +1,7 @@
+import { vi } from "vitest";
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Simulate } from 'react-dom/test-utils';
+import { fireEvent } from '@testing-library/react';
 import { EntryDialog, SettingsDialog, CommandDialog } from './Dialogs';
 import { Transactions } from './Views';
 import { DEFAULT_SETTINGS } from '../lib/finance';
@@ -36,68 +37,68 @@ afterEach(async () => {
   container.remove();
 });
 test('clicking the selected expense type preserves category and allocation', async () => {
-  const saveEntry = jest.fn().mockResolvedValue(undefined);
+  const saveEntry = vi.fn().mockResolvedValue(undefined);
   await render(
     <EntryDialog
       entry={expense}
       month={new Date(2026, 7, 1)}
       ledger={{ saveEntry }}
-      onClose={jest.fn()}
-      notify={jest.fn()}
+      onClose={vi.fn()}
+      notify={vi.fn()}
     />,
   );
   await click(button('Money out'));
   expect(container.querySelector('select[name="category"]').value).toBe('Housing');
   expect(container.querySelector('input[value="need"]').checked).toBe(true);
-  await act(async () => Simulate.submit(container.querySelector('form')));
+  await act(async () => fireEvent.submit(container.querySelector('form')));
   expect(saveEntry).toHaveBeenCalledWith(
     expect.objectContaining({ category: 'Housing', expense_category: 'need', amount: 1200 }),
     7,
   );
 });
 test('failed transaction saves keep the dialog and expose an error', async () => {
-  const onClose = jest.fn();
+  const onClose = vi.fn();
   await render(
     <EntryDialog
       entry={expense}
       month={new Date(2026, 7, 1)}
-      ledger={{ saveEntry: jest.fn().mockRejectedValue(new Error('offline')) }}
+      ledger={{ saveEntry: vi.fn().mockRejectedValue(new Error('offline')) }}
       onClose={onClose}
-      notify={jest.fn()}
+      notify={vi.fn()}
     />,
   );
-  await act(async () => Simulate.submit(container.querySelector('form')));
+  await act(async () => fireEvent.submit(container.querySelector('form')));
   expect(container.querySelector('[role="alert"]').textContent).toContain('couldn’t save');
   expect(onClose).not.toHaveBeenCalled();
 });
 test('invalid allocation totals cannot be submitted', async () => {
-  const saveSettings = jest.fn();
+  const saveSettings = vi.fn();
   await render(
     <SettingsDialog
       ledger={{ settings: DEFAULT_SETTINGS, saveSettings }}
-      onClose={jest.fn()}
-      notify={jest.fn()}
+      onClose={vi.fn()}
+      notify={vi.fn()}
     />,
   );
   const input = container.querySelector('input[aria-label="Needs percentage"]');
-  await act(async () => Simulate.change(input, { target: { value: '80' } }));
+  await act(async () => fireEvent.change(input, { target: { value: '80' } }));
   expect(button('Save your plan').disabled).toBe(true);
-  await act(async () => Simulate.submit(container.querySelector('form')));
+  await act(async () => fireEvent.submit(container.querySelector('form')));
   expect(saveSettings).not.toHaveBeenCalled();
 });
 test('workspace search finds the visible Recurring label', async () => {
-  const navigate = jest.fn();
+  const navigate = vi.fn();
   await render(
     <CommandDialog
       ledger={{ entries: [] }}
       navigate={navigate}
-      onClose={jest.fn()}
-      onEdit={jest.fn()}
-      onAdd={jest.fn()}
+      onClose={vi.fn()}
+      onEdit={vi.fn()}
+      onAdd={vi.fn()}
     />,
   );
   await act(async () =>
-    Simulate.change(container.querySelector('input'), { target: { value: 'recurring' } }),
+    fireEvent.change(container.querySelector('input'), { target: { value: 'recurring' } }),
   );
   await click(button('Recurring'));
   expect(navigate).toHaveBeenCalledWith('subscriptions');
@@ -120,10 +121,10 @@ test('spending drilldowns exclude income and savings but respect all-history sco
           history: 'all',
         })
       }
-      setParams={jest.fn()}
-      onEdit={jest.fn()}
-      onAdd={jest.fn()}
-      notify={jest.fn()}
+      setParams={vi.fn()}
+      onEdit={vi.fn()}
+      onAdd={vi.fn()}
+      notify={vi.fn()}
     />,
   );
   expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
