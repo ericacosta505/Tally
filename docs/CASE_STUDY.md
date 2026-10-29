@@ -58,7 +58,7 @@ Demo data is anchored to the current date. Reset it if revisiting in a later mon
 
 The project demonstrates product judgment and end-to-end implementation, not a production banking system. It intentionally avoids pretend bank connections, nonfunctional cancellation buttons, invented AI insights, and fake savings claims.
 
-The most valuable next increment is a privacy and reliability release: remove unnecessary signup fields through a migration, move sessions to HTTP-only cookies, add recovery and verification, rate-limit auth, migrate money storage to integer cents, and replace the inherited React Scripts toolchain. For larger ledgers, add server-side pagination and analytics with the same financial invariants. CSV import would then require a preview, validation, duplicate detection, and atomic commit.
+The most valuable next increment is a privacy and reliability release: remove unnecessary signup fields through a migration, move sessions to HTTP-only cookies, add recovery and verification, rate-limit auth, migrate money storage to integer cents, and replace the inherited Vite toolchain. For larger ledgers, add server-side pagination and analytics with the same financial invariants. CSV import would then require a preview, validation, duplicate detection, and atomic commit.
 
 ## Resume language
 

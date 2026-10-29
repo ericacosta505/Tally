@@ -1,11 +1,11 @@
-FROM node:22-alpine AS frontend
+FROM node:26.13.0-alpine AS frontend
 WORKDIR /build/frontend
 COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm install --global npm@12.2.1 && npm ci --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
-FROM python:3.12-slim
+FROM python:3.15.2-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=5000
 WORKDIR /app
 COPY backend/requirements.txt backend/requirements.txt

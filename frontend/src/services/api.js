@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const resolveDefaultBaseUrl = () => {
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
+  const configuredUrl = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL;
+  if (configuredUrl) {
+    return configuredUrl;
   }
   if (typeof window === 'undefined') {
     return 'http://127.0.0.1:5000/api';
@@ -22,7 +23,7 @@ const resolveDefaultBaseUrl = () => {
 
 const API_BASE_URL = resolveDefaultBaseUrl().replace(/\/$/, '');
 
-if (process.env.NODE_ENV !== 'production') {
+if (import.meta.env.DEV) {
   // Helpful when debugging connectivity issues locally.
   console.info(`[Tally] Using API base URL: ${API_BASE_URL}`);
 }
