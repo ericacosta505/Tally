@@ -1,4 +1,4 @@
-FROM node:26.13.0-alpine AS frontend
+FROM node:26.13.1-alpine AS frontend
 WORKDIR /build/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install --global npm@12.2.1 && npm ci --no-audit --no-fund
